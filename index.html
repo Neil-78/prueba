@@ -19,6 +19,7 @@
             --g-accent: #ff66b3;
             
             /* TEMA NATURE/NUTRIA */
+            --n-bg-base: #111a13;
             --n-card-bg: rgba(255, 255, 255, 0.12);
             --n-border: rgba(255, 255, 255, 0.35);
             --n-text: #f0f4f0;
@@ -26,30 +27,28 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        @media (pointer: fine) { * { cursor: none; } } /* Oculta cursor en PC */
+        @media (pointer: fine) { * { cursor: none; } } 
 
         body {
             font-family: var(--font-main);
             overflow-x: hidden;
-            background-color: #000;
+            background-color: var(--g-bg-black);
+            color: var(--g-text);
         }
 
         /* === CAPA BASE: FASE 2 (NATURE) === */
-        /* Esta capa está detrás y se revela cuando la Fase 1 se levanta */
         #base-layer {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 1; overflow-y: auto;
+            z-index: 1; overflow: hidden; /* Evita que se trabe antes de tiempo */
             background: 
                 radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.7) 0%, transparent 60%),
                 radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 60%),
-                #111a13;
-            display: flex; flex-direction: column;
+                var(--n-bg-base);
         }
 
-        /* Árboles difuminados al fondo de la Fase 2 */
         .forest-bg {
-            position: fixed; top: 0; left: -5%; width: 110%; height: 110%;
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
             background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
             background-size: cover; background-position: center;
             opacity: 0.15; filter: blur(15px);
@@ -59,9 +58,8 @@
 
         @keyframes breatheForest { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
 
-        /* Hojas cayendo */
         #falling-leaves {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0; overflow: hidden;
         }
         .leaf {
@@ -76,12 +74,11 @@
         }
 
         /* === CAPA TELÓN: FASE 1 (GALAXY) === */
-        /* Esta capa está encima y es la que vamos a "jalar" hacia arriba */
         #curtain-layer {
             position: relative; z-index: 10;
             width: 100vw; min-height: 100vh;
             background: var(--g-bg-black);
-            will-change: transform; /* Súper optimización */
+            will-change: transform; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
@@ -95,11 +92,11 @@
         }
 
         /* === HEADER FLOTANTE === */
-        /* Lo mantenemos con z-index alto para que no desaparezca, solo se transforma */
         .header-container {
             position: fixed; top: clamp(10px, 3vw, 25px); left: clamp(10px, 4vw, 30px);
             display: flex; align-items: center; z-index: 1000;
             transition: all 1.5s ease;
+            pointer-events: none; /* Evita que el header trabe los toques en la pantalla */
         }
         .logo-img {
             width: clamp(50px, 8vw, 80px); height: auto; image-rendering: crisp-edges;
@@ -121,7 +118,6 @@
         }
         @keyframes titleFadeIn { to { opacity: 1; } }
 
-        /* Cambio de estilo del Header en Fase 2 */
         body.theme-nature-active .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
         body.theme-nature-active .logo-img { filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6)); }
 
@@ -133,7 +129,6 @@
             display: flex; flex-direction: column; gap: clamp(40px, 6vw, 60px); 
         }
 
-        /* Estilos de las cajas */
         .letter-section {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -153,50 +148,80 @@
             font-size: 1.2rem; opacity: 0.4; color: var(--g-accent);
         }
 
-        .video-block {
-            border-radius: 18px; overflow: hidden; background: #050505;
-            border: 2px solid rgba(255, 255, 255, 0.05); box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-            transition: transform 0.4s ease;
+        /* === OPTIMIZACIÓN DE VIDEOS YOUTUBE (FACHADAS) === */
+        .youtube-player {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            max-width: 100%; background: #000; border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            cursor: pointer; transition: transform 0.4s ease, border-color 1.5s;
         }
-        .video-block iframe { width: 100%; aspect-ratio: 16 / 9; border: none; display: block; }
+        .youtube-player:hover { transform: scale(1.03); border-color: rgba(255, 255, 255, 0.3); }
+        .youtube-player img {
+            object-fit: cover; display: block; left: 0; bottom: 0; margin: auto;
+            max-width: 100%; width: 100%; position: absolute; right: 0; top: 0;
+            border: none; height: 100%; cursor: pointer; transition: 0.4s all;
+            opacity: 0.8;
+        }
+        .youtube-player img:hover { opacity: 1; filter: brightness(1.1); }
+        .youtube-player .play-button {
+            width: 70px; height: 70px; background-color: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; justify-content: center; align-items: center;
+            border: 2px solid rgba(255, 102, 179, 0.6); backdrop-filter: blur(4px);
+        }
+        .youtube-player .play-button::before {
+            content: ''; border-style: solid; border-width: 15px 0 15px 25px;
+            border-color: transparent transparent transparent #fff; margin-left: 5px;
+        }
+        .youtube-player iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; background: transparent; border: none;
+        }
 
-        /* Transformación visual de las cajas para la Fase 2 (Nature) */
         #base-layer .text-block {
             background: var(--n-card-bg); border-color: var(--n-border);
             color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
         }
         #base-layer .text-block::after { color: #8fa883; }
-        #base-layer .video-block { border-color: rgba(255, 255, 255, 0.2); }
+        #base-layer .youtube-player { border-color: rgba(255, 255, 255, 0.2); }
+        #base-layer .youtube-player .play-button { border-color: #d1e2c9; }
 
 
-        /* === LA CUERDA INTERACTIVA (MECANISMO DE TELÓN) === */
+        /* === LA CUERDA INTERACTIVA NUEVA === */
         .rope-container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-top: 50px; margin-bottom: 250px; /* Mucho margen abajo para poder jalar a gusto */
-            touch-action: none; /* Evita que el celular scrollee al tocar la cuerda */
+            margin-top: 50px; margin-bottom: 300px;
+            touch-action: none; position: relative;
         }
-
         .pull-instruction {
             font-family: var(--font-main); font-size: 0.9rem; letter-spacing: 3px;
-            color: var(--g-accent); text-transform: uppercase; margin-bottom: 10px;
-            animation: pulseText 2s infinite; opacity: 0.7;
+            color: var(--g-accent); text-transform: uppercase; margin-bottom: 20px;
+            animation: pulseText 2s infinite; opacity: 0.7; z-index: 2;
         }
-
         @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; text-shadow: 0 0 10px var(--g-accent); } }
 
-        .rope-graphic {
-            width: 80px; height: 350px;
-            background-image: url('cuerda.png'); /* TU IMAGEN DE CUERDA */
-            background-size: cover; background-position: center;
-            /* Si la imagen que me pasaste es horizontal, la rotamos aquí para que cuelgue verticalmente */
-            transform: rotate(90deg); 
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
-            cursor: grab;
+        /* Contenedor para rotar la imagen horizontal a vertical */
+        .rope-rotation-wrapper {
+            width: 50px; height: 350px; 
+            position: relative; display: flex; justify-content: center;
         }
 
-        .rope-graphic:active { cursor: grabbing; }
+        .rope-graphic {
+            width: 400px; /* Ancho de la foto original */
+            height: 50px; /* Grosor de la cuerda */
+            background-image: url('cuerda.png'); 
+            background-size: contain; background-repeat: no-repeat; background-position: left center;
+            transform-origin: center center;
+            transform: rotate(-90deg) translateX(-175px); /* Gira la cuerda para que quede colgando */
+            position: absolute; top: 50%; left: 50%;
+            margin-top: -25px; margin-left: -200px; /* Centrado absoluto */
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.8));
+            cursor: grab;
+        }
+        .rope-graphic:active { cursor: grabbing; filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.9)) brightness(0.9); }
 
-        /* Cursor */
         .cursor-trail {
             position: fixed; top: 0; left: 0; width: 12px; height: 12px;
             background: var(--g-accent); border-radius: 50%; pointer-events: none;
@@ -205,13 +230,20 @@
         }
         @media (pointer: fine) { .cursor-trail { display: block; } }
         body.theme-nature-active .cursor-trail { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
+        
+        #flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #fff; z-index: 9999; opacity: 0; pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
 <body>
 
     <div class="cursor-trail" id="cursor"></div>
+    <div id="flash-overlay"></div>
 
-    <div class="header-container">
+    <div class="header-container" id="header">
         <img src="axolote.png" alt="Logo" class="logo-img" id="header-logo">
         <h1 class="header-title" id="header-title">una carta de un amor que ni yo entiendo</h1>
     </div>
@@ -222,16 +254,16 @@
         
         <main class="letter-content" id="phase2-content" style="margin-top: 200px;">
             <section class="letter-section"><div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/wbmtjppqalA" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="wbmtjppqalA"></div></section>
             
             <section class="letter-section"><div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/V-3hNbCJfFY" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="V-3hNbCJfFY"></div></section>
             
             <section class="letter-section"><div class="text-block"><p>para mi esto dejo de ser un</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/_T-vAh_JF74" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="_T-vAh_JF74"></div></section>
             
             <section class="letter-section"><div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/OkZvaM2Lj_8" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="OkZvaM2Lj_8"></div></section>
         </main>
     </div>
 
@@ -240,75 +272,96 @@
         
         <main class="letter-content">
             <section class="letter-section"><div class="text-block"><p>Hola gigi, me siento medio loquito del centro haciendo una carta asi sabes? es raro pero antes que nada sabes que te odio cabronsisimo no? machin machin y aun asi tengo</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WP_jITzqB7M" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="WP_jITzqB7M"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Y eso es que aunque ya te lo dijera muchas veces aunque ya hablamos de eso siento que las palabras no son suficientes para pedir disculpas osea wey nmms no se si sepas pero fuiste bueno mas bien</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WqKqj3Q1wrw" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="WqKqj3Q1wrw"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Me cuesta tanto decir eso que mejor pongo una cancion sabes? daaaah, es que soy top 3 genios de esta generacion, que miedo sonar bien onichan nmms pero tenia que hacer la "carta" por que</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/RR7mOicpAe4" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="RR7mOicpAe4"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>es raro como que desde que volvimos a hablar no se, es igual que antes pero no como</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/7JNQUsVegcY" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="7JNQUsVegcY"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>No se si entiendas es que como te falla aveces pues, pero ya osea me desvio del tema y no quiero hacer mil bocetos tipo quiero decir la real sabes? a lo que me refiero es que ahora siento que estoy</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZU45FAshhwg" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="ZU45FAshhwg"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>no se si solo es por que</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/iUASF5h5G1w" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="iUASF5h5G1w"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Osea no tanto solo un poquito o por que simplemente</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/F4i3O7T488I" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="F4i3O7T488I"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Simplemente no quiero estar</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/-GHvDpMZB3I" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="-GHvDpMZB3I"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Me refiero a estar solo sin ti, no se wey ponte vergas al menos</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/qk-iLHtabpg" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="qk-iLHtabpg"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>O como se llame tu rancho wey, igual si no pasa solo sera por que</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/LrS7nLEVES8" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="LrS7nLEVES8"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>No quisieron ver juntas a</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/86EzBBQwloo" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="86EzBBQwloo"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Tan conectadas en un mismo planeta sabes? alch me vale verga si eso quieren por que igual</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/AJTEcfWZx-U" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="AJTEcfWZx-U"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Iba a poner otra cosa aqui pero al final me dio penita y ash osea callate y escucha</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/5q-nZg1D_Ik" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="5q-nZg1D_Ik"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Luego me parece irreal que tengo amigos que mi familia ni topo para nada y tu osea todos te topan hasta tu familia ahora me topa que onda, medio inevitable por que</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/be-sT9W0i2A" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="be-sT9W0i2A"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Se que no estoy expresandome tanto en el texto solo estoy hablando de no se, cosas que aja pero por esa justa razon me asegure de buscar canciones que digan lo que senti, siento y probablemente sentire despues sabes? todo lo que dicen son factos sabes?</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/A-95gA5RZaU" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="A-95gA5RZaU"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Entiendas aunque sea un poco de lo mucho que te amo osea nmms wey captas que tu</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/etWdAXYy2Gc" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="etWdAXYy2Gc"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Tal vez tu ya</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/pq85VSFhi0c" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="pq85VSFhi0c"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>pero igual queria dejar en claro que nuestras</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/GG_xNkiuWrU" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="GG_xNkiuWrU"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Estan conectadas o al menos la mia</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZJoznujj3Lk" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="ZJoznujj3Lk"></div></section>
 
             <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
-            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/tGKCkLYIDdo" loading="lazy"></iframe></div></section>
+            <section class="letter-section"><div class="youtube-player" data-id="tGKCkLYIDdo"></div></section>
 
             <div class="rope-container" id="rope-zone">
                 <div class="pull-instruction">Arrástrame hacia arriba</div>
-                <div class="rope-graphic" id="rope-graphic"></div>
+                <div class="rope-rotation-wrapper">
+                    <div class="rope-graphic" id="rope-graphic"></div>
+                </div>
             </div>
-
         </main>
     </div>
 
     <script>
-        // --- 1. Lógica del Cursor ---
+        // --- 1. OPTIMIZACIÓN DE VIDEOS DE YOUTUBE ---
+        document.addEventListener("DOMContentLoaded", function() {
+            var v = document.getElementsByClassName("youtube-player");
+            for (var n = 0; n < v.length; n++) {
+                var p = document.createElement("div");
+                p.innerHTML = '<img src="https://img.youtube.com/vi/' + v[n].dataset.id + '/hqdefault.jpg"><div class="play-button"></div>';
+                p.onclick = labnolIframe;
+                v[n].appendChild(p);
+            }
+        });
+
+        function labnolIframe() {
+            var iframe = document.createElement("iframe");
+            iframe.setAttribute("src", "https://www.youtube.com/embed/" + this.parentNode.dataset.id + "?autoplay=1&autohide=1&border=0&wmode=opaque&enablejsapi=1");
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "1");
+            this.parentNode.replaceChild(iframe, this);
+        }
+
+        // --- 2. Lógica del Cursor ---
         const cursor = document.getElementById('cursor');
         if (window.matchMedia("(pointer: fine)").matches) {
             let mouseX = 0, mouseY = 0;
@@ -320,7 +373,7 @@
             animateCursor();
         }
 
-        // --- 2. Scroll Animations (Aparición de Cajas) ---
+        // --- 3. Animaciones al Scrollear ---
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -330,10 +383,9 @@
             });
         }, { threshold: 0.15 });
 
-        // Solo observamos la Fase 1 al inicio
         document.querySelectorAll('#curtain-layer .letter-section').forEach(sec => observer.observe(sec));
 
-        // --- 3. Animación de Hojas Cayendo (Fase 2) ---
+        // --- 4. Animación de Hojas Cayendo ---
         function crearHojas() {
             const container = document.getElementById('falling-leaves');
             const numHojas = 40; 
@@ -351,19 +403,18 @@
             }
         }
 
-        // --- 4. LA FÍSICA DEL TELÓN (JALAR LA CUERDA) ---
+        // --- 5. FÍSICA DEL TELÓN MEJORADA (LA CUERDA) ---
         const curtain = document.getElementById('curtain-layer');
         const ropeZone = document.getElementById('rope-graphic');
         let isDragging = false;
         let startY = 0;
-        let isTransitioned = false; // Evita activar dos veces
+        let isTransitioned = false;
 
         const startDrag = (e) => {
             if (isTransitioned) return;
             isDragging = true;
             startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            curtain.style.transition = 'none'; // Sigue el dedo instantáneamente
-            document.body.style.overflow = 'hidden'; // Evita scroll de la página al jalar
+            curtain.style.transition = 'none'; 
         };
 
         const onDrag = (e) => {
@@ -371,36 +422,32 @@
             const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
             const deltaY = currentY - startY;
             
-            // Solo permite jalar hacia ARRIBA (valores negativos)
-            if (deltaY < 0) {
+            if (deltaY < 0) { // Solo jalar hacia arriba
                 curtain.style.transform = `translateY(${deltaY}px)`;
+                e.preventDefault(); 
             }
-            e.preventDefault(); // Detiene comportamientos nativos del celular
         };
 
         const endDrag = (e) => {
             if (!isDragging) return;
             isDragging = false;
-            document.body.style.overflow = 'auto'; // Restaura el scroll
             
-            // Calculamos cuánto jaló el usuario
             const transformStyle = curtain.style.transform;
             const match = transformStyle.match(/translateY\(([-\d.]+)px\)/);
             
             if (match) {
                 const pullAmount = parseFloat(match[1]);
-                // Si jaló más de 150px o el 25% de la pantalla, ¡se abre el telón!
-                if (pullAmount < -150 || pullAmount < -window.innerHeight * 0.25) {
+                // Si jala más de 100px hacia arriba, se abre el telón
+                if (pullAmount < -100) {
                     abrirTelon();
                 } else {
-                    // Si no jaló lo suficiente, rebota a su lugar
+                    // Rebote elástico si no jala lo suficiente
                     curtain.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                     curtain.style.transform = `translateY(0)`;
                 }
             }
         };
 
-        // Eventos para Celular y PC
         ropeZone.addEventListener('mousedown', startDrag);
         ropeZone.addEventListener('touchstart', startDrag, {passive: false});
         window.addEventListener('mousemove', onDrag, {passive: false});
@@ -408,42 +455,50 @@
         window.addEventListener('mouseup', endDrag);
         window.addEventListener('touchend', endDrag);
 
-        // --- 5. FUNCIÓN CINEMÁTICA PRINCIPAL ---
+        // --- 6. TRANSICIÓN CINEMÁTICA ---
         function abrirTelon() {
-            isTransitioned = true; // Bloquea la cuerda
+            isTransitioned = true; 
             
-            // 1. El Telón se levanta a máxima velocidad
             curtain.style.transition = 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            curtain.style.transform = `translateY(-120vh)`; // Se va hasta arriba de la pantalla
+            curtain.style.transform = `translateY(-120vh)`; 
 
-            // 2. Cambio de Textos e Imágenes mientras el telón sube
             const title = document.getElementById('header-title');
             const logo = document.getElementById('header-logo');
+            const flash = document.getElementById('flash-overlay');
+            const baseLayer = document.getElementById('base-layer');
             
             title.style.opacity = '0';
             logo.style.opacity = '0';
             
             setTimeout(() => {
-                document.body.classList.add('theme-nature-active');
-                title.textContent = 'la carta de un amor que ahora entiendo';
-                logo.src = 'nutria.png'; // Reemplazo de Ajolote por Nutria
+                flash.style.opacity = '1';
                 
-                title.style.opacity = '1';
-                logo.style.opacity = '1';
+                setTimeout(() => {
+                    document.body.classList.add('theme-nature-active');
+                    title.textContent = 'la carta de un amor que ahora entiendo';
+                    logo.src = 'nutria.png'; // Cambio a la nutria
+                    
+                    title.style.opacity = '1';
+                    logo.style.opacity = '1';
+                    
+                    curtain.style.display = 'none'; 
+                    baseLayer.style.position = 'relative'; // Permite el scroll normal en fase 2
+                    baseLayer.style.height = 'auto';
+                    baseLayer.style.overflow = 'visible';
+
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    crearHojas(); 
+                    
+                    const p2Sections = document.querySelectorAll('#phase2-content .letter-section');
+                    p2Sections.forEach((sec, index) => {
+                        if(index < 2) setTimeout(() => sec.classList.add('visible'), 500); 
+                        else observer.observe(sec);
+                    });
+
+                    setTimeout(() => { flash.style.opacity = '0'; }, 400);
+
+                }, 1000); 
             }, 500);
-
-            // 3. Destruir la Fase 1 y Activar la Fase 2 (Naturaleza)
-            setTimeout(() => {
-                curtain.style.display = 'none'; // Borramos el telón
-                crearHojas(); // Llueven hojas
-                
-                // Animamos la entrada de las nuevas secciones
-                const p2Sections = document.querySelectorAll('#phase2-content .letter-section');
-                p2Sections.forEach((sec, index) => {
-                    setTimeout(() => { sec.classList.add('visible'); }, 300 * index);
-                });
-
-            }, 1000); // 1 segundo después de que el telón subió
         }
     </script>
 </body>
