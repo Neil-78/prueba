@@ -6,19 +6,19 @@
     <title>Una carta de un amor</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* === VARIABLES GLOBALES === */
+        /* === VARIABLES GLOBALES Y PALETAS TOP === */
         :root {
             --font-main: 'Poppins', sans-serif;
             --font-script: 'Dancing Script', cursive;
             
-            /* TEMA GALAXY */
+            /* TEMA GALAXY (Fase 1) - Neón Rosa/Morado */
             --g-bg-black: #030305;
             --g-card-bg: rgba(20, 5, 35, 0.45);
             --g-border: rgba(255, 102, 179, 0.25);
             --g-text: #eaeaea;
             --g-accent: #ff66b3;
             
-            /* TEMA NATURE/NUTRIA */
+            /* TEMA NATURE/NUTRIA (Fase 2) - Verde, Blanco, Café Nutria */
             --n-bg-base: #111a13;
             --n-card-bg: rgba(255, 255, 255, 0.12);
             --n-border: rgba(255, 255, 255, 0.35);
@@ -26,27 +26,34 @@
             --n-accent: #d1e2c9; 
         }
 
+        /* RESET & BASE STYLES OPTIMIZADOS MÓVIL */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        @media (pointer: fine) { * { cursor: none; } } 
 
         body {
             font-family: var(--font-main);
             overflow-x: hidden;
+            scroll-behavior: smooth;
             background-color: var(--g-bg-black);
             color: var(--g-text);
         }
 
-        /* === CAPA BASE: FASE 2 (NATURE) === */
+        @media (pointer: fine) { * { cursor: none; } }
+
+        /* --- CAPA BASE OPTIMIZADA (FASE 2) --- */
         #base-layer {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 1; overflow: hidden; /* Evita que se trabe antes de tiempo */
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; /* Estará detrás */
+            display: none; /* OCULTO POR DEFECTO PARA MÓVIL */
+            opacity: 0;
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             background: 
                 radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.7) 0%, transparent 60%),
                 radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 60%),
                 var(--n-bg-base);
         }
 
+        /* Árboles difuminados al fondo (FASE 2) */
         .forest-bg {
             position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
             background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
@@ -56,8 +63,7 @@
             z-index: -1; pointer-events: none;
         }
 
-        @keyframes breatheForest { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
-
+        /* Hojas cayendo (FASE 2) */
         #falling-leaves {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0; overflow: hidden;
@@ -66,6 +72,8 @@
             position: absolute; color: var(--n-accent);
             animation: fall linear infinite; will-change: transform;
         }
+        
+        @keyframes breatheForest { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
             10% { opacity: 1; }
@@ -73,12 +81,14 @@
             100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
         }
 
-        /* === CAPA TELÓN: FASE 1 (GALAXY) === */
+        /* --- CAPA TELÓN OPTIMIZADA (FASE 1) --- */
         #curtain-layer {
-            position: relative; z-index: 10;
-            width: 100vw; min-height: 100vh;
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            min-height: 100vh;
             background: var(--g-bg-black);
-            will-change: transform; 
+            will-change: transform; /* Súper optimización */
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
@@ -91,37 +101,73 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* === HEADER FLOTANTE === */
+        /* --- HEADER ADAPTATIVO OPTIMIZADO (2 LOGOS) --- */
         .header-container {
-            position: fixed; top: clamp(10px, 3vw, 25px); left: clamp(10px, 4vw, 30px);
-            display: flex; align-items: center; z-index: 1000;
+            position: fixed;
+            top: clamp(10px, 3vw, 25px);
+            left: clamp(10px, 4vw, 30px);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
             transition: all 1.5s ease;
-            pointer-events: none; /* Evita que el header trabe los toques en la pantalla */
+            pointer-events: none;
         }
+
+        .logo-wrapper {
+            position: relative;
+            width: clamp(50px, 8vw, 80px);
+            height: clamp(50px, 8vw, 80px);
+            display: flex; justify-content: center; align-items: center;
+        }
+
         .logo-img {
-            width: clamp(50px, 8vw, 80px); height: auto; image-rendering: crisp-edges;
-            animation: logoIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            position: absolute;
+            width: 100%;
+            height: auto;
+            image-rendering: crisp-edges;
             filter: drop-shadow(0 0 12px rgba(255, 102, 179, 0.6));
             transition: opacity 0.5s ease, filter 1.5s ease;
         }
+
+        /* Animación inicial del ajolote */
+        .galaxy-logo {
+            animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 1;
+        }
+
+        /* Nutria oculta al inicio */
+        .nature-logo {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s;
+        }
+
         .header-title {
-            font-family: var(--font-script); font-size: clamp(1.2rem, 3vw, 2.2rem);
-            color: #fff; margin-left: 15px; opacity: 0;
+            font-family: var(--font-script);
+            font-size: clamp(1.2rem, 3vw, 2.2rem);
+            color: #fff;
+            margin-left: 15px; 
+            opacity: 0;
             text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
             animation: titleFadeIn 1s ease-out 1.8s forwards;
             transition: text-shadow 1.5s ease, opacity 0.5s ease;
         }
-        @keyframes logoIntro {
+
+        @keyframes axolotlIntro {
             0% { transform: scale(4) translate(40vw, 40vh); opacity: 0; }
             40% { opacity: 1; transform: scale(4) translate(40vw, 40vh); }
             100% { transform: scale(1) translate(0, 0); } 
         }
         @keyframes titleFadeIn { to { opacity: 1; } }
 
+        /* Transiciones visuales del Header para la Fase 2 */
         body.theme-nature-active .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
         body.theme-nature-active .logo-img { filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6)); }
+        
+        body.theme-nature-active .galaxy-logo { opacity: 0; }
+        body.theme-nature-active .nature-logo { opacity: 1; transform: scale(1); }
 
-        /* === CONTENEDOR DE LA CARTA === */
+        /* === CONTENEDOR DE LA CARTA OPTIMIZADO === */
         .letter-content {
             width: 100%; max-width: 750px;
             margin: clamp(120px, 15vw, 160px) auto 80px auto; 
@@ -129,6 +175,7 @@
             display: flex; flex-direction: column; gap: clamp(40px, 6vw, 60px); 
         }
 
+        /* Estilos de las cajas */
         .letter-section {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -165,7 +212,8 @@
         }
         .youtube-player img:hover { opacity: 1; filter: brightness(1.1); }
         .youtube-player .play-button {
-            width: 70px; height: 70px; background-color: rgba(0,0,0,0.6);
+            width: clamp(50px, 10vw, 70px); height: clamp(50px, 10vw, 70px); 
+            background-color: rgba(0,0,0,0.6);
             box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 50%;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: flex; justify-content: center; align-items: center;
@@ -180,6 +228,7 @@
             z-index: 100; background: transparent; border: none;
         }
 
+        /* Transformación visual de las cajas para la Fase 2 (Nature) */
         #base-layer .text-block {
             background: var(--n-card-bg); border-color: var(--n-border);
             color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
@@ -189,10 +238,10 @@
         #base-layer .youtube-player .play-button { border-color: #d1e2c9; }
 
 
-        /* === LA CUERDA INTERACTIVA NUEVA === */
+        /* === LA CUERDA INTERACTIVA NUEVA Y OPTIMIZADA === */
         .rope-container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-top: 50px; margin-bottom: 300px;
+            margin-top: 50px; margin-bottom: 250px;
             touch-action: none; position: relative;
         }
         .pull-instruction {
@@ -202,26 +251,30 @@
         }
         @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; text-shadow: 0 0 10px var(--g-accent); } }
 
-        /* Contenedor para rotar la imagen horizontal a vertical */
+        /* Contenedor vertical para la cuerda original horizontal */
         .rope-rotation-wrapper {
-            width: 50px; height: 350px; 
+            width: clamp(40px, 10vw, 60px); height: clamp(250px, 50vw, 350px); 
             position: relative; display: flex; justify-content: center;
         }
 
         .rope-graphic {
-            width: 400px; /* Ancho de la foto original */
-            height: 50px; /* Grosor de la cuerda */
+            width: clamp(250px, 50vw, 350px); /* Ancho de la foto original */
+            height: clamp(40px, 10vw, 60px); /* Grosor de la cuerda */
             background-image: url('cuerda.png'); 
-            background-size: contain; background-repeat: no-repeat; background-position: left center;
+            background-size: cover; background-repeat: no-repeat; background-position: left center;
             transform-origin: center center;
-            transform: rotate(-90deg) translateX(-175px); /* Gira la cuerda para que quede colgando */
+            /* Gira la cuerda para que quede colgando y apunta hacia abajo responsivamente */
+            transform: rotate(-90deg); 
             position: absolute; top: 50%; left: 50%;
-            margin-top: -25px; margin-left: -200px; /* Centrado absoluto */
+            /* Centrado responsivo con márgenes negativos dinámicos */
+            margin-top: calc(-1 * clamp(40px, 10vw, 60px) / 2); 
+            margin-left: calc(-1 * clamp(250px, 50vw, 350px) / 2);
             filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.8));
             cursor: grab;
         }
         .rope-graphic:active { cursor: grabbing; filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.9)) brightness(0.9); }
 
+        /* Cursor Trail TOP */
         .cursor-trail {
             position: fixed; top: 0; left: 0; width: 12px; height: 12px;
             background: var(--g-accent); border-radius: 50%; pointer-events: none;
@@ -231,6 +284,7 @@
         @media (pointer: fine) { .cursor-trail { display: block; } }
         body.theme-nature-active .cursor-trail { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
         
+        /* DESTELLO DE TRANSICIÓN ÉPICO */
         #flash-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #fff; z-index: 9999; opacity: 0; pointer-events: none;
@@ -244,7 +298,10 @@
     <div id="flash-overlay"></div>
 
     <div class="header-container" id="header">
-        <img src="axolote.png" alt="Logo" class="logo-img" id="header-logo">
+        <div class="logo-wrapper">
+            <img src="axolote.png" alt="Ajolote" class="logo-img galaxy-logo">
+            <img src="nutria.png" alt="Nutria" class="logo-img nature-logo">
+        </div>
         <h1 class="header-title" id="header-title">una carta de un amor que ni yo entiendo</h1>
     </div>
 
@@ -341,7 +398,7 @@
     </div>
 
     <script>
-        // --- 1. OPTIMIZACIÓN DE VIDEOS DE YOUTUBE ---
+        // --- 1. OPTIMIZACIÓN DE VIDEOS DE YOUTUBE (FACHADAS) TOP ---
         document.addEventListener("DOMContentLoaded", function() {
             var v = document.getElementsByClassName("youtube-player");
             for (var n = 0; n < v.length; n++) {
@@ -361,7 +418,7 @@
             this.parentNode.replaceChild(iframe, this);
         }
 
-        // --- 2. Lógica del Cursor ---
+        // --- 2. Lógica del Cursor Trail Épico ---
         const cursor = document.getElementById('cursor');
         if (window.matchMedia("(pointer: fine)").matches) {
             let mouseX = 0, mouseY = 0;
@@ -373,7 +430,7 @@
             animateCursor();
         }
 
-        // --- 3. Animaciones al Scrollear ---
+        // --- 3. Animaciones al Scrollear Cinemáticas ---
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -383,9 +440,10 @@
             });
         }, { threshold: 0.15 });
 
+        // Solo observamos la Fase 1 al inicio
         document.querySelectorAll('#curtain-layer .letter-section').forEach(sec => observer.observe(sec));
 
-        // --- 4. Animación de Hojas Cayendo ---
+        // --- 4. Animación de Hojas Cayendo Épica (Fase 2) ---
         function crearHojas() {
             const container = document.getElementById('falling-leaves');
             const numHojas = 40; 
@@ -403,7 +461,7 @@
             }
         }
 
-        // --- 5. FÍSICA DEL TELÓN MEJORADA (LA CUERDA) ---
+        // --- 5. FÍSICA DEL TELÓN MEJORADA (LA CUERDA MÓVIL) ---
         const curtain = document.getElementById('curtain-layer');
         const ropeZone = document.getElementById('rope-graphic');
         let isDragging = false;
@@ -424,7 +482,7 @@
             
             if (deltaY < 0) { // Solo jalar hacia arriba
                 curtain.style.transform = `translateY(${deltaY}px)`;
-                e.preventDefault(); 
+                e.preventDefault(); // Evita scroll de la página al jalar en móvil
             }
         };
 
@@ -437,17 +495,18 @@
             
             if (match) {
                 const pullAmount = parseFloat(match[1]);
-                // Si jala más de 100px hacia arriba, se abre el telón
+                // Si jala más de 100px hacia arriba responsivamente, se abre el telón
                 if (pullAmount < -100) {
                     abrirTelon();
                 } else {
-                    // Rebote elástico si no jala lo suficiente
+                    // Rebote elástico premium si no jala lo suficiente
                     curtain.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                     curtain.style.transform = `translateY(0)`;
                 }
             }
         };
 
+        // Eventos para Celular y PC Épicos
         ropeZone.addEventListener('mousedown', startDrag);
         ropeZone.addEventListener('touchstart', startDrag, {passive: false});
         window.addEventListener('mousemove', onDrag, {passive: false});
@@ -455,50 +514,58 @@
         window.addEventListener('mouseup', endDrag);
         window.addEventListener('touchend', endDrag);
 
-        // --- 6. TRANSICIÓN CINEMÁTICA ---
+        // --- 6. TRANSICIÓN CINEMATOGRÁFICA ÉPICA (CORREGIDO MÓVIL) ---
         function abrirTelon() {
-            isTransitioned = true; 
+            isTransitioned = true; // Bloquea la cuerda
             
             curtain.style.transition = 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            curtain.style.transform = `translateY(-120vh)`; 
+            curtain.style.transform = `translateY(-120vh)`; // Se va hasta arriba de la pantalla
 
             const title = document.getElementById('header-title');
-            const logo = document.getElementById('header-logo');
+            const logoWrapper = document.querySelector('.logo-wrapper');
             const flash = document.getElementById('flash-overlay');
             const baseLayer = document.getElementById('base-layer');
+            const phase2Content = document.getElementById('phase2-content');
             
+            // Efecto cinematográfico disolve del título
             title.style.opacity = '0';
-            logo.style.opacity = '0';
             
             setTimeout(() => {
+                // Destello cinemático
                 flash.style.opacity = '1';
                 
                 setTimeout(() => {
+                    // Ocurre la magia detrás de cámaras (mientras está blanco)
+                    // ACTIVAMOS Y MOSTRAMOS LA FASE 2 JUSTO A TIEMPO
                     document.body.classList.add('theme-nature-active');
                     title.textContent = 'la carta de un amor que ahora entiendo';
-                    logo.src = 'nutria.png'; // Cambio a la nutria
-                    
                     title.style.opacity = '1';
-                    logo.style.opacity = '1';
                     
-                    curtain.style.display = 'none'; 
-                    baseLayer.style.position = 'relative'; // Permite el scroll normal en fase 2
-                    baseLayer.style.height = 'auto';
-                    baseLayer.style.overflow = 'visible';
-
+                    curtain.style.display = 'none'; // Borramos el telón de Galaxy
+                    baseLayer.style.display = 'block'; // Mostramos Base (Nature)
+                    
+                    // Aseguramos que el contenido de fase 2 respete el Header
                     window.scrollTo({ top: 0, behavior: 'instant' });
-                    crearHojas(); 
                     
-                    const p2Sections = document.querySelectorAll('#phase2-content .letter-section');
+                    crearHojas(); // Llueven hojas
+
+                    // Animamos la entrada de las nuevas secciones cinemáticamente
+                    const p2Sections = phase2Content.querySelectorAll('.letter-section');
                     p2Sections.forEach((sec, index) => {
+                        // Los primeros 2 se ven de golpe
                         if(index < 2) setTimeout(() => sec.classList.add('visible'), 500); 
                         else observer.observe(sec);
                     });
 
-                    setTimeout(() => { flash.style.opacity = '0'; }, 400);
+                    // Se disipa la luz y activamos la Fase 2 (Naturaleza) cinemáticamente
+                    setTimeout(() => {
+                        flash.style.opacity = '0';
+                        baseLayer.style.opacity = '1';
+                    }, 400);
 
-                }, 1000); 
-            }, 500);
+                }, 1000); // 1 segundo de destello total Cinemático
+
+            }, 500); // Tiempo Cinemático después del tirón
         }
     </script>
 </body>
