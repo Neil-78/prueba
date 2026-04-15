@@ -6,7 +6,7 @@
     <title>Una carta de un amor</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* === VARIABLES GLOBALES Y PALETAS TOP === */
+        /* === VARIABLES GLOBALES === */
         :root {
             --font-main: 'Poppins', sans-serif;
             --font-script: 'Dancing Script', cursive;
@@ -29,28 +29,39 @@
         /* RESET & BASE STYLES */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: var(--font-main);
+        html, body {
+            width: 100%;
+            min-height: 100vh;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            font-family: var(--font-main);
             background-color: var(--g-bg-black);
             color: var(--g-text);
+            scroll-behavior: smooth;
         }
 
         @media (pointer: fine) { * { cursor: none; } }
 
-        /* --- CAPA BASE (FASE 2) OCULTA AL INICIO --- */
-        #base-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; 
-            display: none; 
-            opacity: 0;
+        /* === FONDOS INDEPENDIENTES (Evita que se trabe el scroll) === */
+        .background-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
             transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #bg-galaxy {
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(179, 102, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(255, 102, 179, 0.08) 0%, transparent 40%),
+                url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 1;
+        }
+
+        #bg-nature {
             background: 
                 radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.7) 0%, transparent 60%),
                 radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 60%),
                 var(--n-bg-base);
+            opacity: 0; 
         }
 
         .forest-bg {
@@ -59,18 +70,18 @@
             background-size: cover; background-position: center;
             opacity: 0.15; filter: blur(15px);
             animation: breatheForest 20s infinite alternate;
-            z-index: -1; pointer-events: none;
         }
 
         #falling-leaves {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden;
+            overflow: hidden;
         }
+
         .leaf {
             position: absolute; color: var(--n-accent);
             animation: fall linear infinite; will-change: transform;
         }
-        
+
         @keyframes breatheForest { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
@@ -79,70 +90,48 @@
             100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
         }
 
-        /* --- CAPA TELÓN (FASE 1) --- */
-        #curtain-layer {
-            position: relative;
-            z-index: 10;
-            width: 100vw;
-            min-height: 100vh;
-            background: var(--g-bg-black);
-            will-change: transform; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-        }
-
-        #bg-galaxy {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(179, 102, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(255, 102, 179, 0.08) 0%, transparent 40%),
-                url('https://www.transparenttextures.com/patterns/stardust.png');
-            z-index: -1; pointer-events: none;
-        }
-
-        /* --- HEADER ADAPTATIVO (2 LOGOS) --- */
+        /* --- HEADER ADAPTATIVO --- */
         .header-container {
             position: fixed;
-            top: clamp(10px, 3vw, 25px);
-            left: clamp(10px, 4vw, 30px);
+            top: clamp(10px, 3vw, 20px);
+            left: clamp(10px, 4vw, 20px);
             display: flex;
             align-items: center;
             z-index: 1000;
-            transition: all 1.5s ease;
             pointer-events: none;
         }
 
         .logo-wrapper {
             position: relative;
-            width: clamp(50px, 8vw, 80px);
-            height: clamp(50px, 8vw, 80px);
+            width: clamp(45px, 8vw, 70px);
+            height: clamp(45px, 8vw, 70px);
             display: flex; justify-content: center; align-items: center;
         }
 
         .logo-img {
-            position: absolute;
-            width: 100%;
-            height: auto;
-            image-rendering: crisp-edges;
-            filter: drop-shadow(0 0 12px rgba(255, 102, 179, 0.6));
+            position: absolute; width: 100%; height: auto; image-rendering: crisp-edges;
             transition: opacity 0.5s ease, filter 1.5s ease;
         }
 
         .galaxy-logo {
             animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             opacity: 1;
+            /* TRUCO: Elimina el fondo negro de la imagen jpg que subiste */
+            mix-blend-mode: lighten; 
+            filter: drop-shadow(0 0 12px rgba(255, 102, 179, 0.8));
         }
 
         .nature-logo {
-            opacity: 0;
-            transform: scale(0.9);
+            opacity: 0; transform: scale(0.9);
             transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s;
+            filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6));
         }
 
         .header-title {
             font-family: var(--font-script);
-            font-size: clamp(1.2rem, 3vw, 2.2rem);
+            font-size: clamp(1.1rem, 3.5vw, 2rem);
             color: #fff;
-            margin-left: 15px; 
+            margin-left: 12px; 
             opacity: 0;
             text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
             animation: titleFadeIn 1s ease-out 1.8s forwards;
@@ -156,19 +145,31 @@
         }
         @keyframes titleFadeIn { to { opacity: 1; } }
 
+        /* Cambios del Header al pasar a Fase 2 */
         body.theme-nature-active .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
-        body.theme-nature-active .logo-img { filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6)); }
         body.theme-nature-active .galaxy-logo { opacity: 0; }
         body.theme-nature-active .nature-logo { opacity: 1; transform: scale(1); }
 
-        /* --- CONTENEDOR DE LA CARTA --- */
-        .letter-content {
-            width: 100%; max-width: 750px;
-            margin: clamp(120px, 15vw, 160px) auto 80px auto; 
-            padding: 0 clamp(20px, 5vw, 40px);
-            display: flex; flex-direction: column; gap: clamp(40px, 6vw, 60px); 
+        /* === CONTENIDO PRINCIPAL (Flujo normal para que el scroll no se trabe) === */
+        .content-layer {
+            position: relative; z-index: 10;
+            width: 100vw; min-height: 100vh;
+            will-change: transform;
         }
 
+        .letter-content {
+            width: 100%; max-width: 750px;
+            /* MARGEN CORREGIDO: Más pegado al header en celulares */
+            margin: clamp(80px, 12vw, 120px) auto 80px auto; 
+            padding: 0 clamp(15px, 4vw, 30px);
+            display: flex; flex-direction: column; gap: clamp(30px, 5vw, 50px); 
+        }
+
+        #phase2-content {
+            display: none; /* Oculto al inicio */
+        }
+
+        /* Estilos de las cajas */
         .letter-section {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -179,8 +180,8 @@
             background: var(--g-card-bg); border: 1px solid var(--g-border);
             border-radius: 20px; padding: clamp(20px, 4vw, 35px);
             font-size: clamp(0.95rem, 2.5vw, 1.15rem); color: var(--g-text);
-            line-height: 1.8; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.05); 
+            line-height: 1.8; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.05); 
             position: relative; transition: all 1.5s ease;
         }
         .text-block::after {
@@ -188,7 +189,14 @@
             font-size: 1.2rem; opacity: 0.4; color: var(--g-accent);
         }
 
-        /* --- OPTIMIZACIÓN DE VIDEOS YOUTUBE (FACHADAS) --- */
+        /* Transformación Fase 2 (Vidrio esmerilado blanco) */
+        body.theme-nature-active .text-block {
+            background: var(--n-card-bg); border-color: var(--n-border);
+            color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
+        }
+        body.theme-nature-active .text-block::after { color: #8fa883; }
+
+        /* === VIDEOS (FACHADAS YOUTUBE) === */
         .youtube-player {
             position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
             max-width: 100%; background: #000; border-radius: 18px;
@@ -196,24 +204,22 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             cursor: pointer; transition: transform 0.4s ease, border-color 1.5s;
         }
-        .youtube-player:hover { transform: scale(1.03); border-color: rgba(255, 255, 255, 0.3); }
+        .youtube-player:hover { transform: scale(1.02); }
         .youtube-player img {
             object-fit: cover; display: block; left: 0; bottom: 0; margin: auto;
             max-width: 100%; width: 100%; position: absolute; right: 0; top: 0;
-            border: none; height: 100%; cursor: pointer; transition: 0.4s all;
-            opacity: 0.8;
+            border: none; height: 100%; cursor: pointer; transition: 0.4s all; opacity: 0.8;
         }
         .youtube-player img:hover { opacity: 1; filter: brightness(1.1); }
         .youtube-player .play-button {
             width: clamp(50px, 10vw, 70px); height: clamp(50px, 10vw, 70px); 
-            background-color: rgba(0,0,0,0.6);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 50%;
+            background-color: rgba(0,0,0,0.6); box-shadow: 0 0 20px rgba(0,0,0,0.5); border-radius: 50%;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: flex; justify-content: center; align-items: center;
             border: 2px solid rgba(255, 102, 179, 0.6); backdrop-filter: blur(4px);
         }
         .youtube-player .play-button::before {
-            content: ''; border-style: solid; border-width: 15px 0 15px 25px;
+            content: ''; border-style: solid; border-width: 15px 0 15px 20px;
             border-color: transparent transparent transparent #fff; margin-left: 5px;
         }
         .youtube-player iframe {
@@ -221,60 +227,38 @@
             z-index: 100; background: transparent; border: none;
         }
 
-        #base-layer .text-block {
-            background: var(--n-card-bg); border-color: var(--n-border);
-            color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
-        }
-        #base-layer .text-block::after { color: #8fa883; }
-        #base-layer .youtube-player { border-color: rgba(255, 255, 255, 0.2); }
-        #base-layer .youtube-player .play-button { border-color: #d1e2c9; }
+        body.theme-nature-active .youtube-player { border-color: rgba(255, 255, 255, 0.2); }
+        body.theme-nature-active .youtube-player .play-button { border-color: #d1e2c9; }
 
-        /* --- EL BOTÓN DE TRANSICIÓN TOP --- */
-        .transition-wrapper {
-            display: flex; justify-content: center;
-            margin-top: 20px; margin-bottom: 100px;
-        }
+        /* === BOTÓN DE TRANSICIÓN === */
+        .transition-wrapper { display: flex; justify-content: center; margin-top: 10px; margin-bottom: 80px; }
 
         .btn-transition {
-            background: rgba(255, 102, 179, 0.1);
-            color: #fff;
+            background: rgba(255, 102, 179, 0.1); color: #fff;
             border: 1px solid rgba(255, 102, 179, 0.4);
-            padding: 16px 45px;
-            font-family: var(--font-main);
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            font-weight: 500;
-            border-radius: 50px;
-            cursor: pointer;
-            letter-spacing: 1.5px;
-            backdrop-filter: blur(5px);
-            animation: pulseBtn 2.5s infinite;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(179, 102, 255, 0.1);
+            padding: 15px 40px; font-family: var(--font-main);
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem); font-weight: 500;
+            border-radius: 50px; cursor: pointer; letter-spacing: 1.5px;
+            backdrop-filter: blur(5px); animation: pulseBtn 2.5s infinite;
+            transition: all 0.3s ease; box-shadow: 0 0 20px rgba(179, 102, 255, 0.1);
         }
-
-        .btn-transition:hover {
-            background: rgba(255, 102, 179, 0.3);
-            transform: scale(1.05);
-            animation: none;
-        }
-
+        .btn-transition:hover { background: rgba(255, 102, 179, 0.3); transform: scale(1.05); animation: none; }
         @keyframes pulseBtn {
             0% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0.4); }
             70% { box-shadow: 0 0 0 15px rgba(255, 102, 179, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0); }
         }
 
-        /* Cursor Trail TOP */
+        /* Cursor */
         .cursor-trail {
             position: fixed; top: 0; left: 0; width: 12px; height: 12px;
             background: var(--g-accent); border-radius: 50%; pointer-events: none;
             z-index: 9999; mix-blend-mode: screen; box-shadow: 0 0 15px var(--g-accent);
-            display: none; transition: background 1.5s, box-shadow 1.5s;
+            display: none;
         }
         @media (pointer: fine) { .cursor-trail { display: block; } }
         body.theme-nature-active .cursor-trail { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
         
-        /* DESTELLO DE TRANSICIÓN */
         #flash-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #fff; z-index: 9999; opacity: 0; pointer-events: none;
@@ -287,6 +271,12 @@
     <div class="cursor-trail" id="cursor"></div>
     <div id="flash-overlay"></div>
 
+    <div class="background-layer" id="bg-galaxy"></div>
+    <div class="background-layer" id="bg-nature">
+        <div class="forest-bg"></div>
+        <div id="falling-leaves"></div>
+    </div>
+
     <div class="header-container" id="header">
         <div class="logo-wrapper">
             <img src="axolote.png" alt="Ajolote" class="logo-img galaxy-logo">
@@ -295,28 +285,7 @@
         <h1 class="header-title" id="header-title">una carta de un amor que ni yo entiendo</h1>
     </div>
 
-    <div id="base-layer">
-        <div class="forest-bg"></div>
-        <div id="falling-leaves"></div>
-        
-        <main class="letter-content" id="phase2-content" style="margin-top: 200px;">
-            <section class="letter-section"><div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div></section>
-            <section class="letter-section"><div class="youtube-player" data-id="wbmtjppqalA"></div></section>
-            
-            <section class="letter-section"><div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div></section>
-            <section class="letter-section"><div class="youtube-player" data-id="V-3hNbCJfFY"></div></section>
-            
-            <section class="letter-section"><div class="text-block"><p>para mi esto dejo de ser un</p></div></section>
-            <section class="letter-section"><div class="youtube-player" data-id="_T-vAh_JF74"></div></section>
-            
-            <section class="letter-section"><div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div></section>
-            <section class="letter-section"><div class="youtube-player" data-id="OkZvaM2Lj_8"></div></section>
-        </main>
-    </div>
-
-    <div id="curtain-layer">
-        <div id="bg-galaxy"></div>
-        
+    <div class="content-layer" id="phase1-container">
         <main class="letter-content">
             <section class="letter-section"><div class="text-block"><p>Hola gigi, me siento medio loquito del centro haciendo una carta asi sabes? es raro pero antes que nada sabes que te odio cabronsisimo no? machin machin y aun asi tengo</p></div></section>
             <section class="letter-section"><div class="youtube-player" data-id="WP_jITzqB7M"></div></section>
@@ -384,8 +353,22 @@
         </main>
     </div>
 
+    <main class="letter-content" id="phase2-content">
+        <section class="letter-section"><div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div></section>
+        <section class="letter-section"><div class="youtube-player" data-id="wbmtjppqalA"></div></section>
+        
+        <section class="letter-section"><div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div></section>
+        <section class="letter-section"><div class="youtube-player" data-id="V-3hNbCJfFY"></div></section>
+        
+        <section class="letter-section"><div class="text-block"><p>para mi esto dejo de ser un</p></div></section>
+        <section class="letter-section"><div class="youtube-player" data-id="_T-vAh_JF74"></div></section>
+        
+        <section class="letter-section"><div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div></section>
+        <section class="letter-section"><div class="youtube-player" data-id="OkZvaM2Lj_8"></div></section>
+    </main>
+
     <script>
-        // --- 1. OPTIMIZACIÓN DE VIDEOS DE YOUTUBE (FACHADAS) TOP ---
+        // --- 1. OPTIMIZACIÓN YOUTUBE ---
         document.addEventListener("DOMContentLoaded", function() {
             var v = document.getElementsByClassName("youtube-player");
             for (var n = 0; n < v.length; n++) {
@@ -405,7 +388,7 @@
             this.parentNode.replaceChild(iframe, this);
         }
 
-        // --- 2. Lógica del Cursor Trail ---
+        // --- 2. Cursor ---
         const cursor = document.getElementById('cursor');
         if (window.matchMedia("(pointer: fine)").matches) {
             let mouseX = 0, mouseY = 0;
@@ -417,7 +400,7 @@
             animateCursor();
         }
 
-        // --- 3. Animaciones al Scrollear ---
+        // --- 3. Observer ---
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -427,9 +410,9 @@
             });
         }, { threshold: 0.15 });
 
-        document.querySelectorAll('#curtain-layer .letter-section').forEach(sec => observer.observe(sec));
+        document.querySelectorAll('#phase1-container .letter-section').forEach(sec => observer.observe(sec));
 
-        // --- 4. Animación de Hojas Cayendo Épica (Fase 2) ---
+        // --- 4. Hojas Fase 2 ---
         function crearHojas() {
             const container = document.getElementById('falling-leaves');
             const numHojas = 40; 
@@ -447,60 +430,56 @@
             }
         }
 
-        // --- 5. TRANSICIÓN CINEMATOGRÁFICA ÉPICA (CON BOTÓN) ---
+        // --- 5. TRANSICIÓN FLUIDA Y SIN TRABAS ---
         let isTransitioned = false;
 
         function activarCambioMood() {
             if (isTransitioned) return;
-            isTransitioned = true; // Evita doble clic
+            isTransitioned = true; 
             
-            const curtain = document.getElementById('curtain-layer');
+            const phase1 = document.getElementById('phase1-container');
             const title = document.getElementById('header-title');
             const flash = document.getElementById('flash-overlay');
-            const baseLayer = document.getElementById('base-layer');
+            const bgNature = document.getElementById('bg-nature');
+            const bgGalaxy = document.getElementById('bg-galaxy');
             const phase2Content = document.getElementById('phase2-content');
 
-            // 1. El Telón se levanta automáticamente
-            curtain.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            curtain.style.transform = `translateY(-120vh)`; 
-            
-            // Efecto cinematográfico disolve del título
+            // El contenido de la Fase 1 sube suavemente
+            phase1.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            phase1.style.transform = `translateY(-120vh)`; 
             title.style.opacity = '0';
             
             setTimeout(() => {
-                // 2. Destello cinemático
-                flash.style.opacity = '1';
+                flash.style.opacity = '1'; // Destello
                 
                 setTimeout(() => {
-                    // 3. Magia detrás del destello
+                    // CAMBIO A FASE 2
                     document.body.classList.add('theme-nature-active');
                     title.textContent = 'la carta de un amor que ahora entiendo';
                     title.style.opacity = '1';
                     
-                    curtain.style.display = 'none'; // Borramos Fase 1
-                    baseLayer.style.display = 'block'; // Mostramos Fase 2
+                    bgGalaxy.style.opacity = '0';
+                    bgNature.style.opacity = '1';
                     
-                    // Ajuste de scroll
+                    phase1.style.display = 'none'; // Borramos Fase 1 del flujo
+                    phase2Content.style.display = 'flex'; // Insertamos Fase 2 en el flujo normal
+                    
                     window.scrollTo({ top: 0, behavior: 'instant' });
                     
-                    crearHojas(); // Llueven hojas
+                    crearHojas();
 
-                    // Animamos la entrada de las nuevas secciones
+                    // Aparecen cajas de Fase 2
                     const p2Sections = phase2Content.querySelectorAll('.letter-section');
                     p2Sections.forEach((sec, index) => {
                         if(index < 2) setTimeout(() => sec.classList.add('visible'), 500); 
                         else observer.observe(sec);
                     });
 
-                    // 4. Se disipa la luz y vemos la Fase 2
-                    setTimeout(() => {
-                        flash.style.opacity = '0';
-                        baseLayer.style.opacity = '1';
-                    }, 400);
+                    setTimeout(() => { flash.style.opacity = '0'; }, 400);
 
-                }, 1000); // 1 segundo de pantalla blanca
+                }, 1000); // 1 segundo pantalla blanca
 
-            }, 800); // Da tiempo a ver el telón subiendo antes del flash
+            }, 800); // Dar tiempo a que Phase 1 suba
         }
     </script>
 </body>
