@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Una carta de un amor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* VARIABLES GLOBALES */
+        :root {
+            --font-main: 'Poppins', sans-serif;
+            --font-script: 'Dancing Script', cursive;
+            
+            /* TEMA GALAXY (Fase 1) */
+            --g-bg-black: #030305;
+            --g-card-bg: rgba(20, 5, 35, 0.45);
+            --g-border: rgba(255, 102, 179, 0.25);
+            --g-text: #eaeaea;
+            --g-accent: #ff66b3;
+            
+            /* TEMA NATURE/NUTRIA (Fase 2) */
+            --n-card-bg: rgba(255, 255, 255, 0.12);
+            --n-border: rgba(255, 255, 255, 0.35);
+            --n-text: #f0f4f0;
+            --n-accent: #d1e2c9; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-color: var(--g-bg-black);
+            color: var(--g-text);
+        }
+
+        @media (pointer: fine) { * { cursor: none; } }
+
+        /* --- SISTEMA DE FONDOS --- */
+        #bg-galaxy, #bg-nature {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+            transition: opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #bg-galaxy {
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(179, 102, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(255, 102, 179, 0.08) 0%, transparent 40%),
+                url('https://www.transparenttextures.com/patterns/stardust.png'), var(--g-bg-black);
+            opacity: 1;
+            animation: bgShift 60s linear infinite alternate;
+        }
+
+        /* Gradientes que combinan verde bosque, blanco sutil y café nutria */
+        #bg-nature {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.6) 0%, transparent 50%), /* Nutria */
+                radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 50%), /* Blanco/Verde claro */
+                radial-gradient(circle at 50% 50%, #2a3a2d 0%, #121713 100%); /* Verde oscuro base */
+            opacity: 0; 
+        }
+
+        @keyframes bgShift {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        /* Cursor optimizado */
+        .cursor-trail {
+            position: fixed; top: 0; left: 0;
+            width: 12px; height: 12px;
+            background: var(--g-accent);
+            border-radius: 50%; pointer-events: none;
+            z-index: 9999; mix-blend-mode: screen;
+            box-shadow: 0 0 15px var(--g-accent);
+            display: none; transition: background 1.5s, box-shadow 1.5s;
+        }
+        @media (pointer: fine) { .cursor-trail { display: block; } }
+
+        /* --- HEADER ADAPTATIVO --- */
+        .header-container {
+            position: fixed;
+            top: clamp(10px, 3vw, 25px);
+            left: clamp(10px, 4vw, 30px);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transition: filter 1.5s ease;
+        }
+
+        .axolotl-logo {
+            width: clamp(50px, 8vw, 80px); 
+            height: auto;
+            image-rendering: crisp-edges;
+            animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            filter: drop-shadow(0 0 12px rgba(255, 102, 179, 0.6));
+            transition: filter 2s ease;
+        }
+
+        .header-title {
+            font-family: var(--font-script);
+            font-size: clamp(1.2rem, 3vw, 2.2rem);
+            color: #fff;
+            margin-left: 15px; 
+            opacity: 0;
+            text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
+            animation: titleFadeIn 1s ease-out 1.8s forwards;
+        }
+
+        @keyframes axolotlIntro {
+            0% { transform: scale(4) translate(40vw, 40vh); opacity: 0; }
+            40% { opacity: 1; transform: scale(4) translate(40vw, 40vh); }
+            100% { transform: scale(1) translate(0, 0); } 
+        }
+
+        @keyframes titleFadeIn { to { opacity: 1; } }
+
+        /* --- ESTRUCTURA PRINCIPAL --- */
+        .letter-content {
+            width: 100%;
+            max-width: 750px;
+            margin: clamp(120px, 15vw, 160px) auto 80px auto; 
+            padding: 0 clamp(20px, 5vw, 40px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(40px, 6vw, 60px); 
+        }
+
+        #phase2 {
+            display: none; 
+            opacity: 0;
+        }
+
+        /* --- BLOQUES TEXTO Y VIDEO --- */
+        .letter-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: opacity, transform;
+        }
+
+        .letter-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .text-block {
+            background: var(--g-card-bg);
+            border: 1px solid var(--g-border);
+            border-radius: 20px;
+            padding: clamp(20px, 4vw, 35px);
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            font-weight: 400;
+            line-height: 1.8;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.05); /* Brillo premium */
+            position: relative;
+            transition: all 1.5s ease;
+        }
+
+        .text-block::after {
+            content: '🐾';
+            position: absolute;
+            bottom: 12px; right: 18px;
+            font-size: 1.2rem; opacity: 0.4;
+            color: var(--g-accent);
+            transition: color 1.5s ease;
+        }
+
+        .video-block {
+            border-radius: 18px;
+            overflow: hidden;
+            background: #050505;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 1.5s;
+        }
+
+        .video-block:hover {
+            transform: scale(1.03);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .video-block iframe {
+            width: 100%; aspect-ratio: 16 / 9; 
+            border: none; display: block;
+        }
+
+        /* --- BOTÓN DE TRANSICIÓN --- */
+        .transition-wrapper {
+            display: flex; justify-content: center;
+            margin-top: 20px; margin-bottom: 50px;
+        }
+
+        .btn-transition {
+            background: rgba(255, 102, 179, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 102, 179, 0.4);
+            padding: 16px 45px;
+            font-family: var(--font-main);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(5px);
+            animation: pulseBtn 2.5s infinite;
+            transition: all 0.3s ease;
+        }
+
+        .btn-transition:hover {
+            background: rgba(255, 102, 179, 0.3);
+            transform: scale(1.05);
+            animation: none;
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 102, 179, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0); }
+        }
+
+        /* --- CLASES DE LA FASE 2 (NATURE/NUTRIA) --- */
+        body.theme-nature-active #bg-galaxy { opacity: 0; }
+        body.theme-nature-active #bg-nature { opacity: 1; }
+        
+        body.theme-nature-active .cursor-trail {
+            background: #a3b899; box-shadow: 0 0 15px #a3b899;
+        }
+
+        body.theme-nature-active .axolotl-logo {
+            filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.5)) sepia(0.4) hue-rotate(70deg) brightness(1.2);
+        }
+        
+        body.theme-nature-active .header-title {
+            text-shadow: 0 0 20px rgba(163, 184, 153, 0.6);
+        }
+
+        body.theme-nature-active .text-block {
+            background: var(--n-card-bg);
+            border-color: var(--n-border);
+            color: var(--n-text);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        body.theme-nature-active .text-block::after { color: #8fa883; }
+
+        body.theme-nature-active .video-block {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* DESTELLO DE TRANSICIÓN ÉPICO */
+        #flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #fff; z-index: 9999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-trail" id="cursor"></div>
+    <div id="bg-galaxy"></div>
+    <div id="bg-nature"></div>
+    <div id="flash-overlay"></div>
+
+    <div class="header-container">
+        <img src="axolote.png" alt="Axolote" class="axolotl-logo">
+        <h1 class="header-title">una carta de un amor que ni yo entiendo</h1>
+    </div>
+
+    <main class="letter-content" id="phase1">
+        
+        <section class="letter-section"><div class="text-block"><p>Hola gigi, me siento medio loquito del centro haciendo una carta asi sabes? es raro pero antes que nada sabes que te odio cabronsisimo no? machin machin y aun asi tengo</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WP_jITzqB7M?si=5LraxFU44EXpMG3e" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Y eso es que aunque ya te lo dijera muchas veces aunque ya hablamos de eso siento que las palabras no son suficientes para pedir disculpas osea wey nmms no se si sepas pero fuiste bueno mas bien</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WqKqj3Q1wrw?si=JBDIkt9C0k4pTpoh" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Me cuesta tanto decir eso que mejor pongo una cancion sabes? daaaah, es que soy top 3 genios de esta generacion, que miedo sonar bien onichan nmms pero tenia que hacer la "carta" por que</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/RR7mOicpAe4?si=OcS8WY3edSR1x-cz" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>es raro como que desde que volvimos a hablar no se, es igual que antes pero no como</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/7JNQUsVegcY?si=BABTtRbYEM_ZFMKa" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>No se si entiendas es que como te falla aveces pues, pero ya osea me desvio del tema y no quiero hacer mil bocetos tipo quiero decir la real sabes? a lo que me refiero es que ahora siento que estoy</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZU45FAshhwg?si=RGoxXEnyiTe7LO5t" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>no se si solo es por que</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/iUASF5h5G1w?si=Pp7QYHqwbh-cErCG" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Osea no tanto solo un poquito o por que simplemente</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/F4i3O7T488I?si=Exh1InSXa80OWr7s" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Simplemente no quiero estar</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/-GHvDpMZB3I?si=o7ojT6QaxaEK7sgy" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Me refiero a estar solo sin ti, no se wey ponte vergas al menos</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/qk-iLHtabpg?si=mnZlmKcqAhjzI4LR" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>O como se llame tu rancho wey, igual si no pasa solo sera por que</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/LrS7nLEVES8?si=JFNkpQkOGBrfH4nB" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>No quisieron ver juntas a</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/86EzBBQwloo?si=m2KmQH_AbAcdchnc" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Tan conectadas en un mismo planeta sabes? alch me vale verga si eso quieren por que igual</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/AJTEcfWZx-U?si=-nVwMS0cVm8KCmv1" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Iba a poner otra cosa aqui pero al final me dio penita y ash osea callate y escucha</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/5q-nZg1D_Ik?si=0LVu_wEDbnRh0B0y" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Luego me parece irreal que tengo amigos que mi familia ni topo para nada y tu osea todos te topan hasta tu familia ahora me topa que onda, medio inevitable por que</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/be-sT9W0i2A?si=srC39Vh9ix_nm_X3" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Se que no estoy expresandome tanto en el texto solo estoy hablando de no se, cosas que aja pero por esa justa razon me asegure de buscar canciones que digan lo que senti, siento y probablemente sentire despues sabes? todo lo que dicen son factos sabes?</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/A-95gA5RZaU?si=m67xXvx0fO2-HfcW" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Entiendas aunque sea un poco de lo mucho que te amo osea nmms wey captas que tu</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/etWdAXYy2Gc?si=YiYspUxXdrAnYFdz" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Tal vez tu ya</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/pq85VSFhi0c?si=DnmKm8wkoe4OaBak" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>pero igual queria dejar en claro que nuestras</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/GG_xNkiuWrU?si=oQ8Deb4KoB9e54PI" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Estan conectadas o al menos la mia</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZJoznujj3Lk?si=teadR4Z9TfoxLPNL" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
+        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/tGKCkLYIDdo?si=oh7QxJ8J5TSXIP6o" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+
+        <section class="letter-section transition-wrapper">
+            <button class="btn-transition" onclick="activarCambioMood()">Hay algo más...</button>
+        </section>
+    </main>
+
+    <main class="letter-content" id="phase2">
+        
+        <section class="letter-section">
+            <div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div>
+        </section>
+        <section class="letter-section">
+            <div class="video-block"><iframe src="https://www.youtube.com/embed/wbmtjppqalA" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
+        </section>
+
+        <section class="letter-section">
+            <div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div>
+        </section>
+        <section class="letter-section">
+            <div class="video-block"><iframe src="https://www.youtube.com/embed/V-3hNbCJfFY" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
+        </section>
+
+        <section class="letter-section">
+            <div class="text-block"><p>para mi esto dejo de ser un</p></div>
+        </section>
+        <section class="letter-section">
+            <div class="video-block"><iframe src="https://www.youtube.com/embed/_T-vAh_JF74" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
+        </section>
+
+        <section class="letter-section">
+            <div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div>
+        </section>
+        <section class="letter-section">
+            <div class="video-block"><iframe src="https://www.youtube.com/embed/OkZvaM2Lj_8" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
+        </section>
+
+    </main>
+
+    <script>
+        // Lógica del Cursor
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+            function animateCursor() {
+                cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
+
+        // Lógica de Scroll y Aparición
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 }); // 15% del elemento debe ser visible para activarse
+
+        // Observamos solo los de la fase 1 al inicio
+        document.querySelectorAll('#phase1 .letter-section').forEach(sec => observer.observe(sec));
+
+        // --- TRANSICIÓN CINEMATOGRÁFICA ---
+        function activarCambioMood() {
+            const flash = document.getElementById('flash-overlay');
+            const phase1 = document.getElementById('phase1');
+            const phase2 = document.getElementById('phase2');
+            const p2Sections = phase2.querySelectorAll('.letter-section');
+            
+            // 1. Destello
+            flash.style.opacity = '1';
+            
+            setTimeout(() => {
+                // 2. Ocurre la magia detrás de cámaras (mientras está blanco)
+                document.body.classList.add('theme-nature-active');
+                phase1.style.display = 'none';
+                phase2.style.display = 'flex';
+                
+                // Vamos arriba
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                
+                // Preparamos los elementos de la fase 2
+                p2Sections.forEach((sec, index) => {
+                    sec.classList.remove('visible'); // Reseteamos por si acaso
+                    if(index < 2) {
+                        setTimeout(() => sec.classList.add('visible'), 500); // Entran suave
+                    } else {
+                        observer.observe(sec);
+                    }
+                });
+
+                // 3. Se disipa la luz
+                setTimeout(() => {
+                    flash.style.opacity = '0';
+                    phase2.style.opacity = '1';
+                }, 400);
+
+            }, 1200); // Duración de la pantalla blanca
+        }
+    </script>
+</body>
+</html>
