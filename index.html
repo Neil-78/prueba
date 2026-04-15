@@ -6,387 +6,312 @@
     <title>Una carta de un amor</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* VARIABLES GLOBALES Y PALETAS */
+        /* === VARIABLES GLOBALES === */
         :root {
             --font-main: 'Poppins', sans-serif;
             --font-script: 'Dancing Script', cursive;
             
-            /* TEMA GALAXY (Fase 1) - Neón Rosa/Morado */
+            /* TEMA GALAXY */
             --g-bg-black: #030305;
             --g-card-bg: rgba(20, 5, 35, 0.45);
             --g-border: rgba(255, 102, 179, 0.25);
             --g-text: #eaeaea;
             --g-accent: #ff66b3;
             
-            /* TEMA NATURE/NUTRIA (Fase 2) - Verde, Blanco, Café Nutria */
+            /* TEMA NATURE/NUTRIA */
             --n-card-bg: rgba(255, 255, 255, 0.12);
             --n-border: rgba(255, 255, 255, 0.35);
             --n-text: #f0f4f0;
             --n-accent: #d1e2c9; 
         }
 
-        /* RESET & BASE STYLES */
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        @media (pointer: fine) { * { cursor: none; } } /* Oculta cursor en PC */
 
         body {
             font-family: var(--font-main);
             overflow-x: hidden;
-            scroll-behavior: smooth;
-            background-color: var(--g-bg-black);
-            color: var(--g-text);
+            background-color: #000;
         }
 
-        @media (pointer: fine) { * { cursor: none; } }
+        /* === CAPA BASE: FASE 2 (NATURE) === */
+        /* Esta capa está detrás y se revela cuando la Fase 1 se levanta */
+        #base-layer {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1; overflow-y: auto;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.7) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 60%),
+                #111a13;
+            display: flex; flex-direction: column;
+        }
 
-        /* --- SISTEMA DE FONDOS ÉPICOS --- */
-        #bg-galaxy, #bg-nature {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -2;
-            transition: opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Árboles difuminados al fondo de la Fase 2 */
+        .forest-bg {
+            position: fixed; top: 0; left: -5%; width: 110%; height: 110%;
+            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover; background-position: center;
+            opacity: 0.15; filter: blur(15px);
+            animation: breatheForest 20s infinite alternate;
+            z-index: -1; pointer-events: none;
+        }
+
+        @keyframes breatheForest { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+        /* Hojas cayendo */
+        #falling-leaves {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .leaf {
+            position: absolute; color: var(--n-accent);
+            animation: fall linear infinite; will-change: transform;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+        }
+
+        /* === CAPA TELÓN: FASE 1 (GALAXY) === */
+        /* Esta capa está encima y es la que vamos a "jalar" hacia arriba */
+        #curtain-layer {
+            position: relative; z-index: 10;
+            width: 100vw; min-height: 100vh;
+            background: var(--g-bg-black);
+            will-change: transform; /* Súper optimización */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
         #bg-galaxy {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: 
                 radial-gradient(circle at 15% 50%, rgba(179, 102, 255, 0.12) 0%, transparent 40%),
                 radial-gradient(circle at 85% 30%, rgba(255, 102, 179, 0.08) 0%, transparent 40%),
-                url('https://www.transparenttextures.com/patterns/stardust.png'), var(--g-bg-black);
-            opacity: 1;
-            animation: bgShift 60s linear infinite alternate;
+                url('https://www.transparenttextures.com/patterns/stardust.png');
+            z-index: -1; pointer-events: none;
         }
 
-        /* Gradientes que combinan verde bosque, blanco sutil y café nutria */
-        #bg-nature {
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.6) 0%, transparent 50%), /* Nutria */
-                radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.2) 0%, transparent 50%), /* Blanco/Verde claro */
-                radial-gradient(circle at 50% 50%, #2a3a2d 0%, #121713 100%); /* Verde oscuro base */
-            opacity: 0; 
-        }
-
-        /* FONDO ANIMADO DE HOJAS CAYENDO (FASE 2) */
-        #falling-leaves-container {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; pointer-events: none; display: none;
-            opacity: 0; transition: opacity 2s ease-in-out;
-        }
-        #falling-leaves-container.active { display: block; opacity: 1; }
-        
-        .falling-leaf {
-            position: absolute; width: clamp(10px, 3vw, 25px); height: auto;
-            image-rendering: auto; opacity: 0;
-            animation: leafFall linear infinite; will-change: transform, opacity;
-        }
-
-        @keyframes bgShift { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
-        @keyframes leafFall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* Cursor optimizado y adaptativo */
-        .cursor-trail {
-            position: fixed; top: 0; left: 0;
-            width: 12px; height: 12px;
-            background: var(--g-accent);
-            border-radius: 50%; pointer-events: none;
-            z-index: 9999; mix-blend-mode: screen;
-            box-shadow: 0 0 15px var(--g-accent);
-            display: none; transition: background 1.5s, box-shadow 1.5s, transform 0.1s linear;
-        }
-        @media (pointer: fine) { .cursor-trail { display: block; } }
-
-        /* --- HEADER ADAPTATIVO TOP --- */
+        /* === HEADER FLOTANTE === */
+        /* Lo mantenemos con z-index alto para que no desaparezca, solo se transforma */
         .header-container {
-            position: fixed;
-            top: clamp(10px, 3vw, 25px);
-            left: clamp(10px, 4vw, 30px);
-            display: flex;
-            align-items: center;
-            z-index: 1000;
-            transition: filter 1.5s ease, transform 0.5s ease;
+            position: fixed; top: clamp(10px, 3vw, 25px); left: clamp(10px, 4vw, 30px);
+            display: flex; align-items: center; z-index: 1000;
+            transition: all 1.5s ease;
         }
-
-        .axolotl-logo {
-            width: clamp(50px, 8vw, 80px); 
-            height: auto;
-            image-rendering: crisp-edges;
-            animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        .logo-img {
+            width: clamp(50px, 8vw, 80px); height: auto; image-rendering: crisp-edges;
+            animation: logoIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             filter: drop-shadow(0 0 12px rgba(255, 102, 179, 0.6));
-            transition: filter 2s ease;
+            transition: opacity 0.5s ease, filter 1.5s ease;
         }
-
         .header-title {
-            font-family: var(--font-script);
-            font-size: clamp(1.2rem, 3vw, 2.2rem);
-            color: #fff;
-            margin-left: 15px; 
-            opacity: 0;
+            font-family: var(--font-script); font-size: clamp(1.2rem, 3vw, 2.2rem);
+            color: #fff; margin-left: 15px; opacity: 0;
             text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
             animation: titleFadeIn 1s ease-out 1.8s forwards;
-            transition: text-shadow 2s ease, opacity 0.5s ease;
+            transition: text-shadow 1.5s ease, opacity 0.5s ease;
         }
-
-        @keyframes axolotlIntro {
+        @keyframes logoIntro {
             0% { transform: scale(4) translate(40vw, 40vh); opacity: 0; }
             40% { opacity: 1; transform: scale(4) translate(40vw, 40vh); }
             100% { transform: scale(1) translate(0, 0); } 
         }
-
         @keyframes titleFadeIn { to { opacity: 1; } }
 
-        /* --- ESTRUCTURA PRINCIPAL OPTIMIZADA --- */
+        /* Cambio de estilo del Header en Fase 2 */
+        body.theme-nature-active .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
+        body.theme-nature-active .logo-img { filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6)); }
+
+        /* === CONTENEDOR DE LA CARTA === */
         .letter-content {
-            width: 100%;
-            max-width: 750px;
+            width: 100%; max-width: 750px;
             margin: clamp(120px, 15vw, 160px) auto 80px auto; 
             padding: 0 clamp(20px, 5vw, 40px);
-            display: flex;
-            flex-direction: column;
-            gap: clamp(40px, 6vw, 60px); 
+            display: flex; flex-direction: column; gap: clamp(40px, 6vw, 60px); 
         }
 
-        #phase2 { display: none; opacity: 0; }
-
-        /* --- BLOQUES TEXTO Y VIDEO TOP --- */
+        /* Estilos de las cajas */
         .letter-section {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-            will-change: opacity, transform;
         }
-
         .letter-section.visible { opacity: 1; transform: translateY(0); }
 
         .text-block {
-            background: var(--g-card-bg);
-            border: 1px solid var(--g-border);
-            border-radius: 20px;
-            padding: clamp(20px, 4vw, 35px);
-            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
-            font-weight: 400;
-            line-height: 1.8;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.05); /* Brillo premium */
-            position: relative;
-            transition: all 1.5s ease;
+            background: var(--g-card-bg); border: 1px solid var(--g-border);
+            border-radius: 20px; padding: clamp(20px, 4vw, 35px);
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem); color: var(--g-text);
+            line-height: 1.8; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.05); 
+            position: relative; transition: all 1.5s ease;
         }
-
         .text-block::after {
-            content: '🐾';
-            position: absolute;
-            bottom: 12px; right: 18px;
-            font-size: 1.2rem; opacity: 0.4;
-            color: var(--g-accent);
-            transition: color 1.5s ease;
+            content: '🐾'; position: absolute; bottom: 12px; right: 18px;
+            font-size: 1.2rem; opacity: 0.4; color: var(--g-accent);
         }
 
         .video-block {
-            border-radius: 18px;
-            overflow: hidden;
-            background: #050505;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-            position: relative;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 1.5s;
+            border-radius: 18px; overflow: hidden; background: #050505;
+            border: 2px solid rgba(255, 255, 255, 0.05); box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            transition: transform 0.4s ease;
         }
-
-        .video-block:hover { transform: scale(1.03); border-color: rgba(255, 255, 255, 0.3); }
-
         .video-block iframe { width: 100%; aspect-ratio: 16 / 9; border: none; display: block; }
 
-        /* --- EL DISPARADOR: LA CUERDA INTERACTIVA TOP --- */
-        .rope-wrapper {
-            display: flex; flex-direction: column; align-items: center;
-            margin-top: 20px; margin-bottom: 50px; position: relative;
+        /* Transformación visual de las cajas para la Fase 2 (Nature) */
+        #base-layer .text-block {
+            background: var(--n-card-bg); border-color: var(--n-border);
+            color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
+        }
+        #base-layer .text-block::after { color: #8fa883; }
+        #base-layer .video-block { border-color: rgba(255, 255, 255, 0.2); }
+
+
+        /* === LA CUERDA INTERACTIVA (MECANISMO DE TELÓN) === */
+        .rope-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin-top: 50px; margin-bottom: 250px; /* Mucho margen abajo para poder jalar a gusto */
+            touch-action: none; /* Evita que el celular scrollee al tocar la cuerda */
         }
 
-        .cord-pull {
-            position: absolute; top: -50px; left: calc(50% + clamp(200px, 30vw, 300px));
-            width: 2px; height: 150px; background: #6b5c49; /* Tono nutria oscuro */
-            border-radius: 2px; box-shadow: 0 0 10px rgba(107, 92, 79, 0.3);
-            transform-origin: top; transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        
-        .cord-pommel {
-            position: absolute; bottom: 0; left: 50%; width: 20px; height: 20px;
-            background: #d1e2c9; /* Tono nutria claro/nutria */
-            border-radius: 50%; transform: translate(-50%, 50%);
-            border: 2px solid #fff; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: breatheBtn 3s infinite ease-in-out;
-            transition: all 0.3s ease;
+        .pull-instruction {
+            font-family: var(--font-main); font-size: 0.9rem; letter-spacing: 3px;
+            color: var(--g-accent); text-transform: uppercase; margin-bottom: 10px;
+            animation: pulseText 2s infinite; opacity: 0.7;
         }
 
-        .cord-pommel:hover { transform: translate(-50%, 50%) scale(1.15); animation: none; }
+        @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; text-shadow: 0 0 10px var(--g-accent); } }
 
-        @keyframes breatheBtn {
-            0% { box-shadow: 0 5px 15px rgba(209, 226, 201, 0.4); }
-            50% { box-shadow: 0 5px 25px rgba(209, 226, 201, 0.8); }
-            100% { box-shadow: 0 5px 15px rgba(209, 226, 201, 0.4); }
+        .rope-graphic {
+            width: 80px; height: 350px;
+            background-image: url('cuerda.png'); /* TU IMAGEN DE CUERDA */
+            background-size: cover; background-position: center;
+            /* Si la imagen que me pasaste es horizontal, la rotamos aquí para que cuelgue verticalmente */
+            transform: rotate(90deg); 
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
+            cursor: grab;
         }
 
-        /* --- CLASES DE LA FASE 2 ÉPICA --- */
-        body.theme-nature-active #bg-galaxy { opacity: 0; }
-        body.theme-nature-active #bg-nature { opacity: 1; }
-        
-        body.theme-nature-active .cursor-trail {
-            background: #a3b899; box-shadow: 0 0 15px #a3b899;
-        }
+        .rope-graphic:active { cursor: grabbing; }
 
-        body.theme-nature-active .axolotl-logo {
-            filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.5)) sepia(0.4) hue-rotate(70deg) brightness(1.2);
+        /* Cursor */
+        .cursor-trail {
+            position: fixed; top: 0; left: 0; width: 12px; height: 12px;
+            background: var(--g-accent); border-radius: 50%; pointer-events: none;
+            z-index: 9999; mix-blend-mode: screen; box-shadow: 0 0 15px var(--g-accent);
+            display: none; transition: background 1.5s, box-shadow 1.5s;
         }
-        
-        body.theme-nature-active .header-title {
-            text-shadow: 0 0 20px rgba(163, 184, 153, 0.6);
-        }
-
-        body.theme-nature-active .text-block {
-            background: var(--n-card-bg);
-            border-color: var(--n-border);
-            color: var(--n-text);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
-        }
-
-        body.theme-nature-active .text-block::after { color: #8fa883; }
-
-        body.theme-nature-active .video-block {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* DESTELLO DE TRANSICIÓN CINEMATOGRÁFICO ÉPICO */
-        #flash-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #fff; z-index: 9999;
-            opacity: 0; pointer-events: none;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        @media (pointer: fine) { .cursor-trail { display: block; } }
+        body.theme-nature-active .cursor-trail { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
     </style>
 </head>
 <body>
 
     <div class="cursor-trail" id="cursor"></div>
-    <div id="bg-galaxy"></div>
-    <div id="bg-nature"></div>
-    <div id="falling-leaves-container"></div>
-    <div id="flash-overlay"></div>
 
-    <div class="header-container" id="header">
-        <img src="axolote.png" alt="Axolote" class="axolotl-logo" id="header-logo">
+    <div class="header-container">
+        <img src="axolote.png" alt="Logo" class="logo-img" id="header-logo">
         <h1 class="header-title" id="header-title">una carta de un amor que ni yo entiendo</h1>
     </div>
 
-    <main class="letter-content" id="phase1">
+    <div id="base-layer">
+        <div class="forest-bg"></div>
+        <div id="falling-leaves"></div>
         
-        <section class="letter-section"><div class="text-block"><p>Hola gigi, me siento medio loquito del centro haciendo una carta asi sabes? es raro pero antes que nada sabes que te odio cabronsisimo no? machin machin y aun asi tengo</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WP_jITzqB7M?si=5LraxFU44EXpMG3e" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+        <main class="letter-content" id="phase2-content" style="margin-top: 200px;">
+            <section class="letter-section"><div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/wbmtjppqalA" loading="lazy"></iframe></div></section>
+            
+            <section class="letter-section"><div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/V-3hNbCJfFY" loading="lazy"></iframe></div></section>
+            
+            <section class="letter-section"><div class="text-block"><p>para mi esto dejo de ser un</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/_T-vAh_JF74" loading="lazy"></iframe></div></section>
+            
+            <section class="letter-section"><div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/OkZvaM2Lj_8" loading="lazy"></iframe></div></section>
+        </main>
+    </div>
 
-        <section class="letter-section"><div class="text-block"><p>Y eso es que aunque ya te lo dijera muchas veces aunque ya hablamos de eso siento que las palabras no son suficientes para pedir disculpas osea wey nmms no se si sepas pero fuiste bueno mas bien</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WqKqj3Q1wrw?si=JBDIkt9C0k4pTpoh" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+    <div id="curtain-layer">
+        <div id="bg-galaxy"></div>
+        
+        <main class="letter-content">
+            <section class="letter-section"><div class="text-block"><p>Hola gigi, me siento medio loquito del centro haciendo una carta asi sabes? es raro pero antes que nada sabes que te odio cabronsisimo no? machin machin y aun asi tengo</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WP_jITzqB7M" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Me cuesta tanto decir eso que mejor pongo una cancion sabes? daaaah, es que soy top 3 genios de esta generacion, que miedo sonar bien onichan nmms pero tenia que hacer la "carta" por que</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/RR7mOicpAe4?si=OcS8WY3edSR1x-cz" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Y eso es que aunque ya te lo dijera muchas veces aunque ya hablamos de eso siento que las palabras no son suficientes para pedir disculpas osea wey nmms no se si sepas pero fuiste bueno mas bien</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/WqKqj3Q1wrw" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>es raro como que desde que volvimos a hablar no se, es igual que antes pero no como</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/7JNQUsVegcY?si=BABTtRbYEM_ZFMKa" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Me cuesta tanto decir eso que mejor pongo una cancion sabes? daaaah, es que soy top 3 genios de esta generacion, que miedo sonar bien onichan nmms pero tenia que hacer la "carta" por que</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/RR7mOicpAe4" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>No se si entiendas es que como te falla aveces pues, pero ya osea me desvio del tema y no quiero hacer mil bocetos tipo quiero decir la real sabes? a lo que me refiero es que ahora siento que estoy</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZU45FAshhwg?si=RGoxXEnyiTe7LO5t" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>es raro como que desde que volvimos a hablar no se, es igual que antes pero no como</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/7JNQUsVegcY" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>no se si solo es por que</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/iUASF5h5G1w?si=Pp7QYHqwbh-cErCG" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>No se si entiendas es que como te falla aveces pues, pero ya osea me desvio del tema y no quiero hacer mil bocetos tipo quiero decir la real sabes? a lo que me refiero es que ahora siento que estoy</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZU45FAshhwg" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Osea no tanto solo un poquito o por que simplemente</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/F4i3O7T488I?si=Exh1InSXa80OWr7s" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>no se si solo es por que</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/iUASF5h5G1w" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Simplemente no quiero estar</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/-GHvDpMZB3I?si=o7ojT6QaxaEK7sgy" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Osea no tanto solo un poquito o por que simplemente</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/F4i3O7T488I" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Me refiero a estar solo sin ti, no se wey ponte vergas al menos</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/qk-iLHtabpg?si=mnZlmKcqAhjzI4LR" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Simplemente no quiero estar</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/-GHvDpMZB3I" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>O como se llame tu rancho wey, igual si no pasa solo sera por que</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/LrS7nLEVES8?si=JFNkpQkOGBrfH4nB" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Me refiero a estar solo sin ti, no se wey ponte vergas al menos</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/qk-iLHtabpg" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>No quisieron ver juntas a</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/86EzBBQwloo?si=m2KmQH_AbAcdchnc" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>O como se llame tu rancho wey, igual si no pasa solo sera por que</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/LrS7nLEVES8" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Tan conectadas en un mismo planeta sabes? alch me vale verga si eso quieren por que igual</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/AJTEcfWZx-U?si=-nVwMS0cVm8KCmv1" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>No quisieron ver juntas a</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/86EzBBQwloo" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Iba a poner otra cosa aqui pero al final me dio penita y ash osea callate y escucha</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/5q-nZg1D_Ik?si=0LVu_wEDbnRh0B0y" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Tan conectadas en un mismo planeta sabes? alch me vale verga si eso quieren por que igual</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/AJTEcfWZx-U" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Luego me parece irreal que tengo amigos que mi familia ni topo para nada y tu osea todos te topan hasta tu familia ahora me topa que onda, medio inevitable por que</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/be-sT9W0i2A?si=srC39Vh9ix_nm_X3" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Iba a poner otra cosa aqui pero al final me dio penita y ash osea callate y escucha</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/5q-nZg1D_Ik" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Se que no estoy expresandome tanto en el texto solo estoy hablando de no se, cosas que aja pero por esa justa razon me asegure de buscar canciones que digan lo que senti, siento y probablemente sentire despues sabes? todo lo que dicen son factos sabes?</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/A-95gA5RZaU?si=m67xXvx0fO2-HfcW" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Luego me parece irreal que tengo amigos que mi familia ni topo para nada y tu osea todos te topan hasta tu familia ahora me topa que onda, medio inevitable por que</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/be-sT9W0i2A" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Entiendas aunque sea un poco de lo mucho que te amo osea nmms wey captas que tu</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/etWdAXYy2Gc?si=YiYspUxXdrAnYFdz" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Se que no estoy expresandome tanto en el texto solo estoy hablando de no se, cosas que aja pero por esa justa razon me asegure de buscar canciones que digan lo que senti, siento y probablemente sentire despues sabes? todo lo que dicen son factos sabes?</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/A-95gA5RZaU" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Tal vez tu ya</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/pq85VSFhi0c?si=DnmKm8wkoe4OaBak" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Entiendas aunque sea un poco de lo mucho que te amo osea nmms wey captas que tu</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/etWdAXYy2Gc" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>pero igual queria dejar en claro que nuestras</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/GG_xNkiuWrU?si=oQ8Deb4KoB9e54PI" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Tal vez tu ya</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/pq85VSFhi0c" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Estan conectadas o al menos la mia</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZJoznujj3Lk?si=teadR4Z9TfoxLPNL" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>pero igual queria dejar en claro que nuestras</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/GG_xNkiuWrU" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
-        <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/tGKCkLYIDdo?si=oh7QxJ8J5TSXIP6o" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
+            <section class="letter-section"><div class="text-block"><p>Estan conectadas o al menos la mia</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/ZJoznujj3Lk" loading="lazy"></iframe></div></section>
 
-        <section class="letter-section rope-wrapper">
-            <div class="cord-pull" id="cord">
-                <div class="cord-pommel" onclick="activarCambioMood()"></div>
+            <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
+            <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/tGKCkLYIDdo" loading="lazy"></iframe></div></section>
+
+            <div class="rope-container" id="rope-zone">
+                <div class="pull-instruction">Arrástrame hacia arriba</div>
+                <div class="rope-graphic" id="rope-graphic"></div>
             </div>
-        </section>
-    </main>
 
-    <main class="letter-content" id="phase2">
-        
-        <section class="letter-section">
-            <div class="text-block"><p>ahora despues de ya un tiempo se lo que siento o mas bien entiendo</p></div>
-        </section>
-        <section class="letter-section">
-            <div class="video-block"><iframe src="https://www.youtube.com/embed/wbmtjppqalA" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
-        </section>
-
-        <section class="letter-section">
-            <div class="text-block"><p>todo lo que siento por ti, que ahora no quiero que seamos</p></div>
-        </section>
-        <section class="letter-section">
-            <div class="video-block"><iframe src="https://www.youtube.com/embed/V-3hNbCJfFY" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
-        </section>
-
-        <section class="letter-section">
-            <div class="text-block"><p>para mi esto dejo de ser un</p></div>
-        </section>
-        <section class="letter-section">
-            <div class="video-block"><iframe src="https://www.youtube.com/embed/_T-vAh_JF74" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
-        </section>
-
-        <section class="letter-section">
-            <div class="text-block"><p>ahora que soy mas consciente de mi mismo, ahora que se lo que siento, que me entiendo que soy mas</p></div>
-        </section>
-        <section class="letter-section">
-            <div class="video-block"><iframe src="https://www.youtube.com/embed/OkZvaM2Lj_8" loading="lazy" frameborder="0" allowfullscreen></iframe></div>
-        </section>
-
-    </main>
+        </main>
+    </div>
 
     <script>
-        // Lógica del Cursor Trail Épico
+        // --- 1. Lógica del Cursor ---
         const cursor = document.getElementById('cursor');
-        let mouseX = 0, mouseY = 0;
-        
         if (window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = 0, mouseY = 0;
             document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
             function animateCursor() {
                 cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
@@ -395,7 +320,7 @@
             animateCursor();
         }
 
-        // Lógica de Scroll y Aparición Cinemática
+        // --- 2. Scroll Animations (Aparición de Cajas) ---
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -405,98 +330,120 @@
             });
         }, { threshold: 0.15 });
 
-        // Observamos solo los de la fase 1 al inicio
-        document.querySelectorAll('#phase1 .letter-section').forEach(sec => observer.observe(sec));
+        // Solo observamos la Fase 1 al inicio
+        document.querySelectorAll('#curtain-layer .letter-section').forEach(sec => observer.observe(sec));
 
-        // Lógica Épica de Hojas Cayendo (Fase 2)
+        // --- 3. Animación de Hojas Cayendo (Fase 2) ---
         function crearHojas() {
-            const container = document.getElementById('falling-leaves-container');
-            const numHojas = 60; // Número de hojas
-
+            const container = document.getElementById('falling-leaves');
+            const numHojas = 40; 
             for (let i = 0; i < numHojas; i++) {
                 const hoja = document.createElement('div');
-                hoja.classList.add('falling-leaf');
-                
-                // Variar forma/color de la hoja (usaremos solo divs estilizados por simplicidad)
-                const forma = Math.random() > 0.5 ? '🍂' : '🍃';
-                hoja.textContent = forma;
-                
-                // Variar tono de verde/nutria
-                hoja.style.color = Math.random() > 0.5 ? '#d1e2c9' : '#a3b899';
-                if (Math.random() > 0.7) hoja.style.color = '#d1e2c9'; // Nutria suave
-
-                // Variar posición horizontal y retraso de animación
+                hoja.classList.add('leaf');
+                hoja.textContent = Math.random() > 0.5 ? '🍂' : '🍃';
                 hoja.style.left = `${Math.random() * 100}vw`;
-                hoja.style.animationDelay = `${Math.random() * 25}s`;
-                hoja.style.animationDuration = `${10 + Math.random() * 15}s`; // Velocidad de caída
-                
-                // Variar desenfoque (difuminado)
-                const desenfoque = `${1 + Math.random() * 3}px`;
-                hoja.style.filter = `blur(${desenfoque})`;
-                hoja.style.fontSize = forma === '🍂' ? '1.2rem' : '1.5rem';
-
+                hoja.style.animationDelay = `${Math.random() * 20}s`;
+                hoja.style.animationDuration = `${10 + Math.random() * 15}s`;
+                hoja.style.fontSize = `${1 + Math.random() * 1.5}rem`;
+                hoja.style.filter = `blur(${Math.random() * 3}px)`;
+                hoja.style.opacity = 0.4 + Math.random() * 0.6;
                 container.appendChild(hoja);
             }
         }
 
-        // --- TRANSICIÓN CINEMATOGRÁFICA ÉPICA (LA CUERDA) ---
-        function activarCambioMood() {
-            const flash = document.getElementById('flash-overlay');
-            const phase1 = document.getElementById('phase1');
-            const phase2 = document.getElementById('phase2');
-            const cord = document.getElementById('cord');
-            const leavesContainer = document.getElementById('falling-leaves-container');
-            const headerTitle = document.getElementById('header-title');
-            const headerLogo = document.getElementById('header-logo');
-            const p2Sections = phase2.querySelectorAll('.letter-section');
+        // --- 4. LA FÍSICA DEL TELÓN (JALAR LA CUERDA) ---
+        const curtain = document.getElementById('curtain-layer');
+        const ropeZone = document.getElementById('rope-graphic');
+        let isDragging = false;
+        let startY = 0;
+        let isTransitioned = false; // Evita activar dos veces
+
+        const startDrag = (e) => {
+            if (isTransitioned) return;
+            isDragging = true;
+            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            curtain.style.transition = 'none'; // Sigue el dedo instantáneamente
+            document.body.style.overflow = 'hidden'; // Evita scroll de la página al jalar
+        };
+
+        const onDrag = (e) => {
+            if (!isDragging) return;
+            const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const deltaY = currentY - startY;
             
-            // 1. Animación Cinemática del Tirón de Cuerda
-            cord.style.height = '180px'; // Se jala hacia abajo
-            setTimeout(() => cord.style.height = '150px', 300); // Rebota
+            // Solo permite jalar hacia ARRIBA (valores negativos)
+            if (deltaY < 0) {
+                curtain.style.transform = `translateY(${deltaY}px)`;
+            }
+            e.preventDefault(); // Detiene comportamientos nativos del celular
+        };
+
+        const endDrag = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            document.body.style.overflow = 'auto'; // Restaura el scroll
             
-            // 2. Destello Cinemático
+            // Calculamos cuánto jaló el usuario
+            const transformStyle = curtain.style.transform;
+            const match = transformStyle.match(/translateY\(([-\d.]+)px\)/);
+            
+            if (match) {
+                const pullAmount = parseFloat(match[1]);
+                // Si jaló más de 150px o el 25% de la pantalla, ¡se abre el telón!
+                if (pullAmount < -150 || pullAmount < -window.innerHeight * 0.25) {
+                    abrirTelon();
+                } else {
+                    // Si no jaló lo suficiente, rebota a su lugar
+                    curtain.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    curtain.style.transform = `translateY(0)`;
+                }
+            }
+        };
+
+        // Eventos para Celular y PC
+        ropeZone.addEventListener('mousedown', startDrag);
+        ropeZone.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('mousemove', onDrag, {passive: false});
+        window.addEventListener('touchmove', onDrag, {passive: false});
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        // --- 5. FUNCIÓN CINEMÁTICA PRINCIPAL ---
+        function abrirTelon() {
+            isTransitioned = true; // Bloquea la cuerda
+            
+            // 1. El Telón se levanta a máxima velocidad
+            curtain.style.transition = 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            curtain.style.transform = `translateY(-120vh)`; // Se va hasta arriba de la pantalla
+
+            // 2. Cambio de Textos e Imágenes mientras el telón sube
+            const title = document.getElementById('header-title');
+            const logo = document.getElementById('header-logo');
+            
+            title.style.opacity = '0';
+            logo.style.opacity = '0';
+            
             setTimeout(() => {
-                flash.style.opacity = '1';
+                document.body.classList.add('theme-nature-active');
+                title.textContent = 'la carta de un amor que ahora entiendo';
+                logo.src = 'nutria.png'; // Reemplazo de Ajolote por Nutria
                 
-                setTimeout(() => {
-                    // 3. Ocurre la magia detrás de cámaras (mientras está blanco)
-                    document.body.classList.add('theme-nature-active');
-                    phase1.style.display = 'none';
-                    phase2.style.display = 'flex';
-                    leavesContainer.classList.add('active'); // Activamos el fondo animado
-                    
-                    // Cambios de Header Cinemáticos (disolve)
-                    headerTitle.style.opacity = '0';
-                    setTimeout(() => {
-                        headerTitle.textContent = 'la carta de un amor que ahora entiendo';
-                        headerTitle.style.opacity = '1';
-                    }, 500);
-                    headerLogo.src = 'image_1.png'; // Reemplazar Ajolote por Nutria
+                title.style.opacity = '1';
+                logo.style.opacity = '1';
+            }, 500);
 
-                    // Vamos arriba instantáneamente
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                    
-                    // Preparamos los elementos de la fase 2
-                    p2Sections.forEach((sec, index) => {
-                        sec.classList.remove('visible'); 
-                        if(index < 2) {
-                            setTimeout(() => sec.classList.add('visible'), 500); 
-                        } else {
-                            observer.observe(sec);
-                        }
-                    });
+            // 3. Destruir la Fase 1 y Activar la Fase 2 (Naturaleza)
+            setTimeout(() => {
+                curtain.style.display = 'none'; // Borramos el telón
+                crearHojas(); // Llueven hojas
+                
+                // Animamos la entrada de las nuevas secciones
+                const p2Sections = document.querySelectorAll('#phase2-content .letter-section');
+                p2Sections.forEach((sec, index) => {
+                    setTimeout(() => { sec.classList.add('visible'); }, 300 * index);
+                });
 
-                    crearHojas(); // Generamos y animamos las hojas
-
-                    // 4. Se disipa la luz Cinemáticamente
-                    setTimeout(() => {
-                        flash.style.opacity = '0';
-                        phase2.style.opacity = '1';
-                    }, 400);
-
-                }, 1200); // Duración Cinemática de la pantalla blanca
-
-            }, 500); // Tiempo después del tirón
+            }, 1000); // 1 segundo después de que el telón subió
         }
     </script>
 </body>
