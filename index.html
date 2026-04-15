@@ -24,7 +24,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
             width: 100%; min-height: 100vh; overflow-x: hidden; 
-            background-color: var(--g-bg-black); 
+            background-color: var(--g-bg-black); color: var(--g-text);
+            scroll-behavior: smooth; font-family: var(--font-main);
         }
         @media (pointer: fine) { * { cursor: none; } }
 
@@ -39,8 +40,7 @@
                 radial-gradient(circle at 15% 50%, rgba(179, 102, 255, 0.12) 0%, transparent 40%),
                 radial-gradient(circle at 85% 30%, rgba(255, 102, 179, 0.08) 0%, transparent 40%),
                 url('https://www.transparenttextures.com/patterns/stardust.png'), var(--g-bg-black);
-            opacity: 1;
-            transition: opacity 1.5s ease;
+            opacity: 1; transition: opacity 1.5s ease;
         }
 
         #bg-nature {
@@ -48,13 +48,12 @@
                 radial-gradient(circle at 20% 80%, rgba(110, 92, 79, 0.8) 0%, transparent 60%),
                 radial-gradient(circle at 80% 20%, rgba(209, 226, 201, 0.3) 0%, transparent 60%),
                 var(--n-bg-base);
-            opacity: 0;
-            transition: opacity 2s ease;
+            opacity: 0; transition: opacity 2s ease;
             display: flex; align-items: center; justify-content: center;
         }
 
         .forest-img-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
             background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1500&q=80');
             background-size: cover; background-position: center;
             opacity: 0.2; filter: blur(8px);
@@ -66,13 +65,11 @@
             z-index: 1; overflow: hidden;
         }
 
-        @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+        @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
         
-        /* Animación de hojas */
         .leaf {
             position: absolute; color: var(--n-accent);
-            animation: fall linear infinite; will-change: transform;
-            z-index: 2;
+            animation: fall linear infinite; will-change: transform; z-index: 2;
         }
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
@@ -83,28 +80,32 @@
 
         /* --- HEADER --- */
         .header-container {
-            position: fixed; top: 20px; left: 20px;
-            display: flex; align-items: center; z-index: 1000;
+            position: fixed; top: clamp(10px, 3vw, 20px); left: clamp(10px, 4vw, 20px);
+            display: flex; align-items: center; z-index: 1000; pointer-events: none;
         }
-        .logo-box { position: relative; width: 60px; height: 60px; }
+        .logo-box { position: relative; width: clamp(45px, 8vw, 70px); height: clamp(45px, 8vw, 70px); display: flex; justify-content: center; align-items: center;}
         .logo-img {
             position: absolute; width: 100%; height: auto;
             transition: opacity 1s ease;
         }
-        .galaxy-logo { mix-blend-mode: lighten; filter: drop-shadow(0 0 10px var(--g-accent)); }
-        .nature-logo { opacity: 0; filter: drop-shadow(0 0 10px var(--n-accent)); }
+        /* Mix-blend-mode quita el fondo negro de la imagen jpg */
+        .galaxy-logo { mix-blend-mode: lighten; filter: drop-shadow(0 0 10px rgba(255, 102, 179, 0.8)); animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;}
+        .nature-logo { opacity: 0; filter: drop-shadow(0 0 12px rgba(209, 226, 201, 0.7)); transform: scale(0.9); transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s;}
 
         .header-title {
-            font-family: var(--font-script); font-size: clamp(1.1rem, 4vw, 2.2rem);
-            color: #fff; margin-left: 15px; text-shadow: 0 0 10px var(--g-accent);
-            transition: all 1s ease;
+            font-family: var(--font-script); font-size: clamp(1.1rem, 3.5vw, 2rem);
+            color: #fff; margin-left: 15px; text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
+            transition: all 1s ease; animation: titleFadeIn 1s ease-out 1.8s forwards; opacity: 0;
         }
+
+        @keyframes axolotlIntro { 0% { transform: scale(4) translate(40vw, 40vh); opacity: 0; } 40% { opacity: 1; transform: scale(4) translate(40vw, 40vh); } 100% { transform: scale(1) translate(0, 0); } }
+        @keyframes titleFadeIn { to { opacity: 1; } }
 
         /* --- CONTENIDO --- */
         .main-wrapper { position: relative; z-index: 10; width: 100%; }
         .letter-content {
-            max-width: 750px; margin: 120px auto 80px;
-            padding: 0 20px; display: flex; flex-direction: column; gap: 40px;
+            max-width: 750px; margin: clamp(80px, 12vw, 120px) auto 80px auto;
+            padding: 0 clamp(15px, 4vw, 30px); display: flex; flex-direction: column; gap: clamp(30px, 5vw, 50px);
         }
 
         .letter-section {
@@ -115,47 +116,61 @@
 
         .text-block {
             background: var(--g-card-bg); border: 1px solid var(--g-border);
-            border-radius: 20px; padding: 25px; line-height: 1.8;
+            border-radius: 20px; padding: clamp(20px, 4vw, 35px); line-height: 1.8;
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            transition: all 1.5s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.05);
+            transition: all 1.5s ease; position: relative;
+        }
+        .text-block::after {
+            content: '🐾'; position: absolute; bottom: 12px; right: 18px;
+            font-size: 1.2rem; opacity: 0.4; color: var(--g-accent);
         }
 
         /* --- YOUTUBE OPTIMIZADO --- */
         .yt-lazy {
             position: relative; padding-bottom: 56.25%; background: #000;
             border-radius: 15px; overflow: hidden; border: 1px solid var(--g-border);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7); cursor: pointer; transition: transform 0.4s ease, border-color 1.5s;
         }
+        .yt-lazy:hover { transform: scale(1.02); }
         .yt-lazy img {
             position: absolute; top: 0; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.8; cursor: pointer;
+            opacity: 0.8; cursor: pointer; transition: 0.4s all;
         }
+        .yt-lazy img:hover { opacity: 1; filter: brightness(1.1); }
         .play-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: rgba(0,0,0,0.7);
+            width: clamp(50px, 10vw, 70px); height: clamp(50px, 10vw, 70px); background: rgba(0,0,0,0.7);
             border-radius: 50%; border: 2px solid var(--g-accent); display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
+            align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);
         }
         .play-btn::after {
-            content: ''; border-style: solid; border-width: 10px 0 10px 18px;
+            content: ''; border-style: solid; border-width: 12px 0 12px 20px;
             border-color: transparent transparent transparent #fff; margin-left: 4px;
         }
 
         /* --- TRANSICIÓN --- */
         #phase2-area { display: none; }
-        .btn-wrap { display: flex; justify-content: center; padding: 40px 0; }
+        .btn-wrap { display: flex; justify-content: center; padding: 20px 0 60px 0; }
         .btn-next {
             background: rgba(255,102,179,0.1); color: #fff; border: 1px solid var(--g-border);
             padding: 15px 35px; border-radius: 30px; cursor: pointer; font-family: var(--font-main);
-            backdrop-filter: blur(5px); animation: pulse 2s infinite;
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            backdrop-filter: blur(5px); animation: pulse 2.5s infinite; transition: all 0.3s ease;
         }
+        .btn-next:hover { background: rgba(255, 102, 179, 0.3); transform: scale(1.05); animation: none; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,102,179,0.4); } 70% { box-shadow: 0 0 0 15px rgba(255,102,179,0); } }
 
         /* ESTADOS FASE 2 */
         body.nature-mode { background-color: var(--n-bg-base); }
-        body.nature-mode .text-block { background: var(--n-card-bg); border-color: var(--n-border); }
-        body.nature-mode .header-title { text-shadow: 0 0 15px var(--n-accent); }
+        body.nature-mode .text-block { background: var(--n-card-bg); border-color: var(--n-border); color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);}
+        body.nature-mode .text-block::after { color: #8fa883; }
+        body.nature-mode .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
         body.nature-mode .yt-lazy { border-color: var(--n-border); }
         body.nature-mode .play-btn { border-color: var(--n-accent); }
+        body.nature-mode .galaxy-logo { opacity: 0; }
+        body.nature-mode .nature-logo { opacity: 1; transform: scale(1); }
 
         #flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -166,9 +181,10 @@
         .cursor {
             position: fixed; width: 12px; height: 12px; background: var(--g-accent);
             border-radius: 50%; pointer-events: none; z-index: 10000;
-            mix-blend-mode: screen; box-shadow: 0 0 10px var(--g-accent); display: none;
+            mix-blend-mode: screen; box-shadow: 0 0 15px var(--g-accent); display: none;
         }
         @media (pointer: fine) { .cursor { display: block; } }
+        body.nature-mode .cursor { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
     </style>
 </head>
 <body>
@@ -198,6 +214,60 @@
             <section class="letter-section"><div class="text-block">Y eso es que aunque ya te lo dijera muchas veces aunque ya hablamos de eso siento que las palabras no son suficientes para pedir disculpas osea wey nmms no se si sepas pero fuiste bueno mas bien</div></section>
             <section class="letter-section"><div class="yt-lazy" data-id="WqKqj3Q1wrw"></div></section>
 
+            <section class="letter-section"><div class="text-block">Me cuesta tanto decir eso que mejor pongo una cancion sabes? daaaah, es que soy top 3 genios de esta generacion, que miedo sonar bien onichan nmms pero tenia que hacer la "carta" por que</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="RR7mOicpAe4"></div></section>
+
+            <section class="letter-section"><div class="text-block">es raro como que desde que volvimos a hablar no se, es igual que antes pero no como</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="7JNQUsVegcY"></div></section>
+
+            <section class="letter-section"><div class="text-block">No se si entiendas es que como te falla aveces pues, pero ya osea me desvio del tema y no quiero hacer mil bocetos tipo quiero decir la real sabes? a lo que me refiero es que ahora siento que estoy</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="ZU45FAshhwg"></div></section>
+
+            <section class="letter-section"><div class="text-block">no se si solo es por que</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="iUASF5h5G1w"></div></section>
+
+            <section class="letter-section"><div class="text-block">Osea no tanto solo un poquito o por que simplemente</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="F4i3O7T488I"></div></section>
+
+            <section class="letter-section"><div class="text-block">Simplemente no quiero estar</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="-GHvDpMZB3I"></div></section>
+
+            <section class="letter-section"><div class="text-block">Me refiero a estar solo sin ti, no se wey ponte vergas al menos</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="qk-iLHtabpg"></div></section>
+
+            <section class="letter-section"><div class="text-block">O como se llame tu rancho wey, igual si no pasa solo sera por que</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="LrS7nLEVES8"></div></section>
+
+            <section class="letter-section"><div class="text-block">No quisieron ver juntas a</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="86EzBBQwloo"></div></section>
+
+            <section class="letter-section"><div class="text-block">Tan conectadas en un mismo planeta sabes? alch me vale verga si eso quieren por que igual</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="AJTEcfWZx-U"></div></section>
+
+            <section class="letter-section"><div class="text-block">Iba a poner otra cosa aqui pero al final me dio penita y ash osea callate y escucha</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="5q-nZg1D_Ik"></div></section>
+
+            <section class="letter-section"><div class="text-block">Luego me parece irreal que tengo amigos que mi familia ni topo para nada y tu osea todos te topan hasta tu familia ahora me topa que onda, medio inevitable por que</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="be-sT9W0i2A"></div></section>
+
+            <section class="letter-section"><div class="text-block">Se que no estoy expresandome tanto en el texto solo estoy hablando de no se, cosas que aja pero por esa justa razon me asegure de buscar canciones que digan lo que senti, siento y probablemente sentire despues sabes? todo lo que dicen son factos sabes?</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="A-95gA5RZaU"></div></section>
+
+            <section class="letter-section"><div class="text-block">Entiendas aunque sea un poco de lo mucho que te amo osea nmms wey captas que tu</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="etWdAXYy2Gc"></div></section>
+
+            <section class="letter-section"><div class="text-block">Tal vez tu ya</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="pq85VSFhi0c"></div></section>
+
+            <section class="letter-section"><div class="text-block">pero igual queria dejar en claro que nuestras</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="GG_xNkiuWrU"></div></section>
+
+            <section class="letter-section"><div class="text-block">Estan conectadas o al menos la mia</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="ZJoznujj3Lk"></div></section>
+
+            <section class="letter-section"><div class="text-block">Ahora y</div></section>
+            <section class="letter-section"><div class="yt-lazy" data-id="tGKCkLYIDdo"></div></section>
+            
             <div class="btn-wrap">
                 <button class="btn-next" onclick="cambiar()">Hay algo más...</button>
             </div>
@@ -221,7 +291,7 @@
     </div>
 
     <script>
-        // Carga de videos
+        // Carga de videos optimizada
         function initYT() {
             const players = document.querySelectorAll('.yt-lazy');
             players.forEach(p => {
@@ -233,54 +303,79 @@
         }
         initYT();
 
-        // Cursor
+        // Cursor interactivo
         const cur = document.getElementById('cursor');
-        document.addEventListener('mousemove', e => {
-            cur.style.left = e.clientX + 'px';
-            cur.style.top = e.clientY + 'px';
-        });
+        if (window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+            function animateCursor() {
+                cur.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
 
-        // Observer
+        // Observer para la aparición suave al hacer scroll
         const obs = new IntersectionObserver(entries => {
             entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('visible'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('.letter-section').forEach(s => obs.observe(s));
 
-        // Hojas
+        // Generador de Hojas para la Fase 2
         function spawnLeaves() {
             const container = document.getElementById('leaf-container');
-            for(let i=0; i<30; i++) {
+            for(let i=0; i<35; i++) {
                 const l = document.createElement('div');
                 l.className = 'leaf';
                 l.textContent = Math.random() > 0.5 ? '🍂' : '🍃';
                 l.style.left = Math.random() * 100 + 'vw';
-                l.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                l.style.animationDuration = (Math.random() * 5 + 8) + 's';
                 l.style.animationDelay = Math.random() * 10 + 's';
                 l.style.fontSize = (Math.random() * 10 + 15) + 'px';
+                l.style.filter = `blur(${Math.random() * 2}px)`;
                 container.appendChild(l);
             }
         }
 
-        // Transición
+        // Función de Transición
+        let isTransitioned = false;
         function cambiar() {
+            if (isTransitioned) return;
+            isTransitioned = true;
+
             const flash = document.getElementById('flash');
-            flash.style.opacity = '1';
+            const p1 = document.getElementById('p1-wrap');
+            
+            // Efecto de que la carta original "sube"
+            p1.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
+            p1.style.transform = `translateY(-50px)`;
             
             setTimeout(() => {
-                document.body.classList.add('nature-mode');
-                document.getElementById('bg-galaxy').style.opacity = '0';
-                document.getElementById('bg-nature').style.opacity = '1';
-                document.getElementById('l-gal').style.opacity = '0';
-                document.getElementById('l-nat').style.opacity = '1';
-                document.getElementById('h-title').textContent = 'la carta de un amor que ahora entiendo';
-                document.getElementById('p1-wrap').style.display = 'none';
-                document.getElementById('phase2-area').style.display = 'block';
+                flash.style.opacity = '1'; // Destello blanco
                 
-                window.scrollTo(0,0);
-                spawnLeaves();
-                
-                setTimeout(() => { flash.style.opacity = '0'; }, 500);
-            }, 800);
+                setTimeout(() => {
+                    // Cambios detrás del destello
+                    document.body.classList.add('nature-mode');
+                    document.getElementById('bg-galaxy').style.opacity = '0';
+                    document.getElementById('bg-nature').style.opacity = '1';
+                    document.getElementById('h-title').textContent = 'la carta de un amor que ahora entiendo';
+                    
+                    p1.style.display = 'none';
+                    document.getElementById('phase2-area').style.display = 'block';
+                    
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    spawnLeaves();
+                    
+                    // Animación de entrada para Fase 2
+                    const p2Sections = document.querySelectorAll('#phase2-area .letter-section');
+                    p2Sections.forEach((sec, index) => {
+                        if(index < 2) setTimeout(() => sec.classList.add('visible'), 500); 
+                    });
+                    
+                    // Disipar destello
+                    setTimeout(() => { flash.style.opacity = '0'; }, 500);
+                }, 800);
+            }, 300);
         }
     </script>
 </body>
