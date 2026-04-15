@@ -6,25 +6,26 @@
     <title>Una carta de un amor</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* VARIABLES GLOBALES */
+        /* VARIABLES GLOBALES Y PALETAS */
         :root {
             --font-main: 'Poppins', sans-serif;
             --font-script: 'Dancing Script', cursive;
             
-            /* TEMA GALAXY (Fase 1) */
+            /* TEMA GALAXY (Fase 1) - Neón Rosa/Morado */
             --g-bg-black: #030305;
             --g-card-bg: rgba(20, 5, 35, 0.45);
             --g-border: rgba(255, 102, 179, 0.25);
             --g-text: #eaeaea;
             --g-accent: #ff66b3;
             
-            /* TEMA NATURE/NUTRIA (Fase 2) */
+            /* TEMA NATURE/NUTRIA (Fase 2) - Verde, Blanco, Café Nutria */
             --n-card-bg: rgba(255, 255, 255, 0.12);
             --n-border: rgba(255, 255, 255, 0.35);
             --n-text: #f0f4f0;
             --n-accent: #d1e2c9; 
         }
 
+        /* RESET & BASE STYLES */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -37,7 +38,7 @@
 
         @media (pointer: fine) { * { cursor: none; } }
 
-        /* --- SISTEMA DE FONDOS --- */
+        /* --- SISTEMA DE FONDOS ÉPICOS --- */
         #bg-galaxy, #bg-nature {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -63,12 +64,29 @@
             opacity: 0; 
         }
 
-        @keyframes bgShift {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.08); }
+        /* FONDO ANIMADO DE HOJAS CAYENDO (FASE 2) */
+        #falling-leaves-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; display: none;
+            opacity: 0; transition: opacity 2s ease-in-out;
+        }
+        #falling-leaves-container.active { display: block; opacity: 1; }
+        
+        .falling-leaf {
+            position: absolute; width: clamp(10px, 3vw, 25px); height: auto;
+            image-rendering: auto; opacity: 0;
+            animation: leafFall linear infinite; will-change: transform, opacity;
         }
 
-        /* Cursor optimizado */
+        @keyframes bgShift { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+        @keyframes leafFall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Cursor optimizado y adaptativo */
         .cursor-trail {
             position: fixed; top: 0; left: 0;
             width: 12px; height: 12px;
@@ -76,11 +94,11 @@
             border-radius: 50%; pointer-events: none;
             z-index: 9999; mix-blend-mode: screen;
             box-shadow: 0 0 15px var(--g-accent);
-            display: none; transition: background 1.5s, box-shadow 1.5s;
+            display: none; transition: background 1.5s, box-shadow 1.5s, transform 0.1s linear;
         }
         @media (pointer: fine) { .cursor-trail { display: block; } }
 
-        /* --- HEADER ADAPTATIVO --- */
+        /* --- HEADER ADAPTATIVO TOP --- */
         .header-container {
             position: fixed;
             top: clamp(10px, 3vw, 25px);
@@ -88,7 +106,7 @@
             display: flex;
             align-items: center;
             z-index: 1000;
-            transition: filter 1.5s ease;
+            transition: filter 1.5s ease, transform 0.5s ease;
         }
 
         .axolotl-logo {
@@ -108,6 +126,7 @@
             opacity: 0;
             text-shadow: 0 0 15px rgba(179, 102, 255, 0.8);
             animation: titleFadeIn 1s ease-out 1.8s forwards;
+            transition: text-shadow 2s ease, opacity 0.5s ease;
         }
 
         @keyframes axolotlIntro {
@@ -118,7 +137,7 @@
 
         @keyframes titleFadeIn { to { opacity: 1; } }
 
-        /* --- ESTRUCTURA PRINCIPAL --- */
+        /* --- ESTRUCTURA PRINCIPAL OPTIMIZADA --- */
         .letter-content {
             width: 100%;
             max-width: 750px;
@@ -129,12 +148,9 @@
             gap: clamp(40px, 6vw, 60px); 
         }
 
-        #phase2 {
-            display: none; 
-            opacity: 0;
-        }
+        #phase2 { display: none; opacity: 0; }
 
-        /* --- BLOQUES TEXTO Y VIDEO --- */
+        /* --- BLOQUES TEXTO Y VIDEO TOP --- */
         .letter-section {
             opacity: 0;
             transform: translateY(30px);
@@ -142,10 +158,7 @@
             will-change: opacity, transform;
         }
 
-        .letter-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .letter-section.visible { opacity: 1; transform: translateY(0); }
 
         .text-block {
             background: var(--g-card-bg);
@@ -181,51 +194,42 @@
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 1.5s;
         }
 
-        .video-block:hover {
-            transform: scale(1.03);
-            border-color: rgba(255, 255, 255, 0.3);
+        .video-block:hover { transform: scale(1.03); border-color: rgba(255, 255, 255, 0.3); }
+
+        .video-block iframe { width: 100%; aspect-ratio: 16 / 9; border: none; display: block; }
+
+        /* --- EL DISPARADOR: LA CUERDA INTERACTIVA TOP --- */
+        .rope-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            margin-top: 20px; margin-bottom: 50px; position: relative;
         }
 
-        .video-block iframe {
-            width: 100%; aspect-ratio: 16 / 9; 
-            border: none; display: block;
+        .cord-pull {
+            position: absolute; top: -50px; left: calc(50% + clamp(200px, 30vw, 300px));
+            width: 2px; height: 150px; background: #6b5c49; /* Tono nutria oscuro */
+            border-radius: 2px; box-shadow: 0 0 10px rgba(107, 92, 79, 0.3);
+            transform-origin: top; transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-
-        /* --- BOTÓN DE TRANSICIÓN --- */
-        .transition-wrapper {
-            display: flex; justify-content: center;
-            margin-top: 20px; margin-bottom: 50px;
-        }
-
-        .btn-transition {
-            background: rgba(255, 102, 179, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 102, 179, 0.4);
-            padding: 16px 45px;
-            font-family: var(--font-main);
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            font-weight: 500;
-            border-radius: 50px;
-            cursor: pointer;
-            letter-spacing: 1.5px;
-            backdrop-filter: blur(5px);
-            animation: pulseBtn 2.5s infinite;
+        
+        .cord-pommel {
+            position: absolute; bottom: 0; left: 50%; width: 20px; height: 20px;
+            background: #d1e2c9; /* Tono nutria claro/nutria */
+            border-radius: 50%; transform: translate(-50%, 50%);
+            border: 2px solid #fff; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: breatheBtn 3s infinite ease-in-out;
             transition: all 0.3s ease;
         }
 
-        .btn-transition:hover {
-            background: rgba(255, 102, 179, 0.3);
-            transform: scale(1.05);
-            animation: none;
+        .cord-pommel:hover { transform: translate(-50%, 50%) scale(1.15); animation: none; }
+
+        @keyframes breatheBtn {
+            0% { box-shadow: 0 5px 15px rgba(209, 226, 201, 0.4); }
+            50% { box-shadow: 0 5px 25px rgba(209, 226, 201, 0.8); }
+            100% { box-shadow: 0 5px 15px rgba(209, 226, 201, 0.4); }
         }
 
-        @keyframes pulseBtn {
-            0% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 102, 179, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0); }
-        }
-
-        /* --- CLASES DE LA FASE 2 (NATURE/NUTRIA) --- */
+        /* --- CLASES DE LA FASE 2 ÉPICA --- */
         body.theme-nature-active #bg-galaxy { opacity: 0; }
         body.theme-nature-active #bg-nature { opacity: 1; }
         
@@ -254,7 +258,7 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* DESTELLO DE TRANSICIÓN ÉPICO */
+        /* DESTELLO DE TRANSICIÓN CINEMATOGRÁFICO ÉPICO */
         #flash-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #fff; z-index: 9999;
@@ -268,11 +272,12 @@
     <div class="cursor-trail" id="cursor"></div>
     <div id="bg-galaxy"></div>
     <div id="bg-nature"></div>
+    <div id="falling-leaves-container"></div>
     <div id="flash-overlay"></div>
 
-    <div class="header-container">
-        <img src="axolote.png" alt="Axolote" class="axolotl-logo">
-        <h1 class="header-title">una carta de un amor que ni yo entiendo</h1>
+    <div class="header-container" id="header">
+        <img src="axolote.png" alt="Axolote" class="axolotl-logo" id="header-logo">
+        <h1 class="header-title" id="header-title">una carta de un amor que ni yo entiendo</h1>
     </div>
 
     <main class="letter-content" id="phase1">
@@ -337,8 +342,10 @@
         <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
         <section class="letter-section"><div class="video-block"><iframe src="https://www.youtube.com/embed/tGKCkLYIDdo?si=oh7QxJ8J5TSXIP6o" loading="lazy" frameborder="0" allowfullscreen></iframe></div></section>
 
-        <section class="letter-section transition-wrapper">
-            <button class="btn-transition" onclick="activarCambioMood()">Hay algo más...</button>
+        <section class="letter-section rope-wrapper">
+            <div class="cord-pull" id="cord">
+                <div class="cord-pommel" onclick="activarCambioMood()"></div>
+            </div>
         </section>
     </main>
 
@@ -375,7 +382,7 @@
     </main>
 
     <script>
-        // Lógica del Cursor
+        // Lógica del Cursor Trail Épico
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0;
         
@@ -388,7 +395,7 @@
             animateCursor();
         }
 
-        // Lógica de Scroll y Aparición
+        // Lógica de Scroll y Aparición Cinemática
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -396,47 +403,100 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.15 }); // 15% del elemento debe ser visible para activarse
+        }, { threshold: 0.15 });
 
         // Observamos solo los de la fase 1 al inicio
         document.querySelectorAll('#phase1 .letter-section').forEach(sec => observer.observe(sec));
 
-        // --- TRANSICIÓN CINEMATOGRÁFICA ---
+        // Lógica Épica de Hojas Cayendo (Fase 2)
+        function crearHojas() {
+            const container = document.getElementById('falling-leaves-container');
+            const numHojas = 60; // Número de hojas
+
+            for (let i = 0; i < numHojas; i++) {
+                const hoja = document.createElement('div');
+                hoja.classList.add('falling-leaf');
+                
+                // Variar forma/color de la hoja (usaremos solo divs estilizados por simplicidad)
+                const forma = Math.random() > 0.5 ? '🍂' : '🍃';
+                hoja.textContent = forma;
+                
+                // Variar tono de verde/nutria
+                hoja.style.color = Math.random() > 0.5 ? '#d1e2c9' : '#a3b899';
+                if (Math.random() > 0.7) hoja.style.color = '#d1e2c9'; // Nutria suave
+
+                // Variar posición horizontal y retraso de animación
+                hoja.style.left = `${Math.random() * 100}vw`;
+                hoja.style.animationDelay = `${Math.random() * 25}s`;
+                hoja.style.animationDuration = `${10 + Math.random() * 15}s`; // Velocidad de caída
+                
+                // Variar desenfoque (difuminado)
+                const desenfoque = `${1 + Math.random() * 3}px`;
+                hoja.style.filter = `blur(${desenfoque})`;
+                hoja.style.fontSize = forma === '🍂' ? '1.2rem' : '1.5rem';
+
+                container.appendChild(hoja);
+            }
+        }
+
+        // --- TRANSICIÓN CINEMATOGRÁFICA ÉPICA (LA CUERDA) ---
         function activarCambioMood() {
             const flash = document.getElementById('flash-overlay');
             const phase1 = document.getElementById('phase1');
             const phase2 = document.getElementById('phase2');
+            const cord = document.getElementById('cord');
+            const leavesContainer = document.getElementById('falling-leaves-container');
+            const headerTitle = document.getElementById('header-title');
+            const headerLogo = document.getElementById('header-logo');
             const p2Sections = phase2.querySelectorAll('.letter-section');
             
-            // 1. Destello
-            flash.style.opacity = '1';
+            // 1. Animación Cinemática del Tirón de Cuerda
+            cord.style.height = '180px'; // Se jala hacia abajo
+            setTimeout(() => cord.style.height = '150px', 300); // Rebota
             
+            // 2. Destello Cinemático
             setTimeout(() => {
-                // 2. Ocurre la magia detrás de cámaras (mientras está blanco)
-                document.body.classList.add('theme-nature-active');
-                phase1.style.display = 'none';
-                phase2.style.display = 'flex';
+                flash.style.opacity = '1';
                 
-                // Vamos arriba
-                window.scrollTo({ top: 0, behavior: 'instant' });
-                
-                // Preparamos los elementos de la fase 2
-                p2Sections.forEach((sec, index) => {
-                    sec.classList.remove('visible'); // Reseteamos por si acaso
-                    if(index < 2) {
-                        setTimeout(() => sec.classList.add('visible'), 500); // Entran suave
-                    } else {
-                        observer.observe(sec);
-                    }
-                });
-
-                // 3. Se disipa la luz
                 setTimeout(() => {
-                    flash.style.opacity = '0';
-                    phase2.style.opacity = '1';
-                }, 400);
+                    // 3. Ocurre la magia detrás de cámaras (mientras está blanco)
+                    document.body.classList.add('theme-nature-active');
+                    phase1.style.display = 'none';
+                    phase2.style.display = 'flex';
+                    leavesContainer.classList.add('active'); // Activamos el fondo animado
+                    
+                    // Cambios de Header Cinemáticos (disolve)
+                    headerTitle.style.opacity = '0';
+                    setTimeout(() => {
+                        headerTitle.textContent = 'la carta de un amor que ahora entiendo';
+                        headerTitle.style.opacity = '1';
+                    }, 500);
+                    headerLogo.src = 'image_1.png'; // Reemplazar Ajolote por Nutria
 
-            }, 1200); // Duración de la pantalla blanca
+                    // Vamos arriba instantáneamente
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    
+                    // Preparamos los elementos de la fase 2
+                    p2Sections.forEach((sec, index) => {
+                        sec.classList.remove('visible'); 
+                        if(index < 2) {
+                            setTimeout(() => sec.classList.add('visible'), 500); 
+                        } else {
+                            observer.observe(sec);
+                        }
+                    });
+
+                    crearHojas(); // Generamos y animamos las hojas
+
+                    // 4. Se disipa la luz Cinemáticamente
+                    setTimeout(() => {
+                        flash.style.opacity = '0';
+                        phase2.style.opacity = '1';
+                    }, 400);
+
+                }, 1200); // Duración Cinemática de la pantalla blanca
+
+            }, 500); // Tiempo después del tirón
         }
     </script>
 </body>
