@@ -11,14 +11,14 @@
             --font-main: 'Poppins', sans-serif;
             --font-script: 'Dancing Script', cursive;
             
-            /* TEMA GALAXY (Fase 1) - Neón Rosa/Morado */
+            /* TEMA GALAXY (Fase 1) */
             --g-bg-black: #030305;
             --g-card-bg: rgba(20, 5, 35, 0.45);
             --g-border: rgba(255, 102, 179, 0.25);
             --g-text: #eaeaea;
             --g-accent: #ff66b3;
             
-            /* TEMA NATURE/NUTRIA (Fase 2) - Verde, Blanco, Café Nutria */
+            /* TEMA NATURE/NUTRIA (Fase 2) */
             --n-bg-base: #111a13;
             --n-card-bg: rgba(255, 255, 255, 0.12);
             --n-border: rgba(255, 255, 255, 0.35);
@@ -26,7 +26,7 @@
             --n-accent: #d1e2c9; 
         }
 
-        /* RESET & BASE STYLES OPTIMIZADOS MÓVIL */
+        /* RESET & BASE STYLES */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -39,12 +39,12 @@
 
         @media (pointer: fine) { * { cursor: none; } }
 
-        /* --- CAPA BASE OPTIMIZADA (FASE 2) --- */
+        /* --- CAPA BASE (FASE 2) OCULTA AL INICIO --- */
         #base-layer {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; /* Estará detrás */
-            display: none; /* OCULTO POR DEFECTO PARA MÓVIL */
+            z-index: -1; 
+            display: none; 
             opacity: 0;
             transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             background: 
@@ -53,7 +53,6 @@
                 var(--n-bg-base);
         }
 
-        /* Árboles difuminados al fondo (FASE 2) */
         .forest-bg {
             position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
             background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
@@ -63,7 +62,6 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* Hojas cayendo (FASE 2) */
         #falling-leaves {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0; overflow: hidden;
@@ -81,14 +79,14 @@
             100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
         }
 
-        /* --- CAPA TELÓN OPTIMIZADA (FASE 1) --- */
+        /* --- CAPA TELÓN (FASE 1) --- */
         #curtain-layer {
             position: relative;
             z-index: 10;
             width: 100vw;
             min-height: 100vh;
             background: var(--g-bg-black);
-            will-change: transform; /* Súper optimización */
+            will-change: transform; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
@@ -101,7 +99,7 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* --- HEADER ADAPTATIVO OPTIMIZADO (2 LOGOS) --- */
+        /* --- HEADER ADAPTATIVO (2 LOGOS) --- */
         .header-container {
             position: fixed;
             top: clamp(10px, 3vw, 25px);
@@ -129,13 +127,11 @@
             transition: opacity 0.5s ease, filter 1.5s ease;
         }
 
-        /* Animación inicial del ajolote */
         .galaxy-logo {
             animation: axolotlIntro 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             opacity: 1;
         }
 
-        /* Nutria oculta al inicio */
         .nature-logo {
             opacity: 0;
             transform: scale(0.9);
@@ -160,14 +156,12 @@
         }
         @keyframes titleFadeIn { to { opacity: 1; } }
 
-        /* Transiciones visuales del Header para la Fase 2 */
         body.theme-nature-active .header-title { text-shadow: 0 0 20px rgba(163, 184, 153, 0.8); }
         body.theme-nature-active .logo-img { filter: drop-shadow(0 0 15px rgba(209, 226, 201, 0.6)); }
-        
         body.theme-nature-active .galaxy-logo { opacity: 0; }
         body.theme-nature-active .nature-logo { opacity: 1; transform: scale(1); }
 
-        /* === CONTENEDOR DE LA CARTA OPTIMIZADO === */
+        /* --- CONTENEDOR DE LA CARTA --- */
         .letter-content {
             width: 100%; max-width: 750px;
             margin: clamp(120px, 15vw, 160px) auto 80px auto; 
@@ -175,7 +169,6 @@
             display: flex; flex-direction: column; gap: clamp(40px, 6vw, 60px); 
         }
 
-        /* Estilos de las cajas */
         .letter-section {
             opacity: 0; transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -195,7 +188,7 @@
             font-size: 1.2rem; opacity: 0.4; color: var(--g-accent);
         }
 
-        /* === OPTIMIZACIÓN DE VIDEOS YOUTUBE (FACHADAS) === */
+        /* --- OPTIMIZACIÓN DE VIDEOS YOUTUBE (FACHADAS) --- */
         .youtube-player {
             position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
             max-width: 100%; background: #000; border-radius: 18px;
@@ -228,7 +221,6 @@
             z-index: 100; background: transparent; border: none;
         }
 
-        /* Transformación visual de las cajas para la Fase 2 (Nature) */
         #base-layer .text-block {
             background: var(--n-card-bg); border-color: var(--n-border);
             color: var(--n-text); box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.1);
@@ -237,42 +229,40 @@
         #base-layer .youtube-player { border-color: rgba(255, 255, 255, 0.2); }
         #base-layer .youtube-player .play-button { border-color: #d1e2c9; }
 
-
-        /* === LA CUERDA INTERACTIVA NUEVA Y OPTIMIZADA === */
-        .rope-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            margin-top: 50px; margin-bottom: 250px;
-            touch-action: none; position: relative;
-        }
-        .pull-instruction {
-            font-family: var(--font-main); font-size: 0.9rem; letter-spacing: 3px;
-            color: var(--g-accent); text-transform: uppercase; margin-bottom: 20px;
-            animation: pulseText 2s infinite; opacity: 0.7; z-index: 2;
-        }
-        @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; text-shadow: 0 0 10px var(--g-accent); } }
-
-        /* Contenedor vertical para la cuerda original horizontal */
-        .rope-rotation-wrapper {
-            width: clamp(40px, 10vw, 60px); height: clamp(250px, 50vw, 350px); 
-            position: relative; display: flex; justify-content: center;
+        /* --- EL BOTÓN DE TRANSICIÓN TOP --- */
+        .transition-wrapper {
+            display: flex; justify-content: center;
+            margin-top: 20px; margin-bottom: 100px;
         }
 
-        .rope-graphic {
-            width: clamp(250px, 50vw, 350px); /* Ancho de la foto original */
-            height: clamp(40px, 10vw, 60px); /* Grosor de la cuerda */
-            background-image: url('cuerda.png'); 
-            background-size: cover; background-repeat: no-repeat; background-position: left center;
-            transform-origin: center center;
-            /* Gira la cuerda para que quede colgando y apunta hacia abajo responsivamente */
-            transform: rotate(-90deg); 
-            position: absolute; top: 50%; left: 50%;
-            /* Centrado responsivo con márgenes negativos dinámicos */
-            margin-top: calc(-1 * clamp(40px, 10vw, 60px) / 2); 
-            margin-left: calc(-1 * clamp(250px, 50vw, 350px) / 2);
-            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.8));
-            cursor: grab;
+        .btn-transition {
+            background: rgba(255, 102, 179, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 102, 179, 0.4);
+            padding: 16px 45px;
+            font-family: var(--font-main);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(5px);
+            animation: pulseBtn 2.5s infinite;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(179, 102, 255, 0.1);
         }
-        .rope-graphic:active { cursor: grabbing; filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.9)) brightness(0.9); }
+
+        .btn-transition:hover {
+            background: rgba(255, 102, 179, 0.3);
+            transform: scale(1.05);
+            animation: none;
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 102, 179, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 102, 179, 0); }
+        }
 
         /* Cursor Trail TOP */
         .cursor-trail {
@@ -284,7 +274,7 @@
         @media (pointer: fine) { .cursor-trail { display: block; } }
         body.theme-nature-active .cursor-trail { background: #a3b899; box-shadow: 0 0 15px #a3b899; }
         
-        /* DESTELLO DE TRANSICIÓN ÉPICO */
+        /* DESTELLO DE TRANSICIÓN */
         #flash-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #fff; z-index: 9999; opacity: 0; pointer-events: none;
@@ -388,12 +378,9 @@
             <section class="letter-section"><div class="text-block"><p>Ahora y</p></div></section>
             <section class="letter-section"><div class="youtube-player" data-id="tGKCkLYIDdo"></div></section>
 
-            <div class="rope-container" id="rope-zone">
-                <div class="pull-instruction">Arrástrame hacia arriba</div>
-                <div class="rope-rotation-wrapper">
-                    <div class="rope-graphic" id="rope-graphic"></div>
-                </div>
-            </div>
+            <section class="letter-section transition-wrapper">
+                <button class="btn-transition" onclick="activarCambioMood()">Hay algo más...</button>
+            </section>
         </main>
     </div>
 
@@ -418,7 +405,7 @@
             this.parentNode.replaceChild(iframe, this);
         }
 
-        // --- 2. Lógica del Cursor Trail Épico ---
+        // --- 2. Lógica del Cursor Trail ---
         const cursor = document.getElementById('cursor');
         if (window.matchMedia("(pointer: fine)").matches) {
             let mouseX = 0, mouseY = 0;
@@ -430,7 +417,7 @@
             animateCursor();
         }
 
-        // --- 3. Animaciones al Scrollear Cinemáticas ---
+        // --- 3. Animaciones al Scrollear ---
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -440,7 +427,6 @@
             });
         }, { threshold: 0.15 });
 
-        // Solo observamos la Fase 1 al inicio
         document.querySelectorAll('#curtain-layer .letter-section').forEach(sec => observer.observe(sec));
 
         // --- 4. Animación de Hojas Cayendo Épica (Fase 2) ---
@@ -461,111 +447,60 @@
             }
         }
 
-        // --- 5. FÍSICA DEL TELÓN MEJORADA (LA CUERDA MÓVIL) ---
-        const curtain = document.getElementById('curtain-layer');
-        const ropeZone = document.getElementById('rope-graphic');
-        let isDragging = false;
-        let startY = 0;
+        // --- 5. TRANSICIÓN CINEMATOGRÁFICA ÉPICA (CON BOTÓN) ---
         let isTransitioned = false;
 
-        const startDrag = (e) => {
+        function activarCambioMood() {
             if (isTransitioned) return;
-            isDragging = true;
-            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            curtain.style.transition = 'none'; 
-        };
-
-        const onDrag = (e) => {
-            if (!isDragging) return;
-            const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            const deltaY = currentY - startY;
+            isTransitioned = true; // Evita doble clic
             
-            if (deltaY < 0) { // Solo jalar hacia arriba
-                curtain.style.transform = `translateY(${deltaY}px)`;
-                e.preventDefault(); // Evita scroll de la página al jalar en móvil
-            }
-        };
-
-        const endDrag = (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            
-            const transformStyle = curtain.style.transform;
-            const match = transformStyle.match(/translateY\(([-\d.]+)px\)/);
-            
-            if (match) {
-                const pullAmount = parseFloat(match[1]);
-                // Si jala más de 100px hacia arriba responsivamente, se abre el telón
-                if (pullAmount < -100) {
-                    abrirTelon();
-                } else {
-                    // Rebote elástico premium si no jala lo suficiente
-                    curtain.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                    curtain.style.transform = `translateY(0)`;
-                }
-            }
-        };
-
-        // Eventos para Celular y PC Épicos
-        ropeZone.addEventListener('mousedown', startDrag);
-        ropeZone.addEventListener('touchstart', startDrag, {passive: false});
-        window.addEventListener('mousemove', onDrag, {passive: false});
-        window.addEventListener('touchmove', onDrag, {passive: false});
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
-
-        // --- 6. TRANSICIÓN CINEMATOGRÁFICA ÉPICA (CORREGIDO MÓVIL) ---
-        function abrirTelon() {
-            isTransitioned = true; // Bloquea la cuerda
-            
-            curtain.style.transition = 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            curtain.style.transform = `translateY(-120vh)`; // Se va hasta arriba de la pantalla
-
+            const curtain = document.getElementById('curtain-layer');
             const title = document.getElementById('header-title');
-            const logoWrapper = document.querySelector('.logo-wrapper');
             const flash = document.getElementById('flash-overlay');
             const baseLayer = document.getElementById('base-layer');
             const phase2Content = document.getElementById('phase2-content');
+
+            // 1. El Telón se levanta automáticamente
+            curtain.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            curtain.style.transform = `translateY(-120vh)`; 
             
             // Efecto cinematográfico disolve del título
             title.style.opacity = '0';
             
             setTimeout(() => {
-                // Destello cinemático
+                // 2. Destello cinemático
                 flash.style.opacity = '1';
                 
                 setTimeout(() => {
-                    // Ocurre la magia detrás de cámaras (mientras está blanco)
-                    // ACTIVAMOS Y MOSTRAMOS LA FASE 2 JUSTO A TIEMPO
+                    // 3. Magia detrás del destello
                     document.body.classList.add('theme-nature-active');
                     title.textContent = 'la carta de un amor que ahora entiendo';
                     title.style.opacity = '1';
                     
-                    curtain.style.display = 'none'; // Borramos el telón de Galaxy
-                    baseLayer.style.display = 'block'; // Mostramos Base (Nature)
+                    curtain.style.display = 'none'; // Borramos Fase 1
+                    baseLayer.style.display = 'block'; // Mostramos Fase 2
                     
-                    // Aseguramos que el contenido de fase 2 respete el Header
+                    // Ajuste de scroll
                     window.scrollTo({ top: 0, behavior: 'instant' });
                     
                     crearHojas(); // Llueven hojas
 
-                    // Animamos la entrada de las nuevas secciones cinemáticamente
+                    // Animamos la entrada de las nuevas secciones
                     const p2Sections = phase2Content.querySelectorAll('.letter-section');
                     p2Sections.forEach((sec, index) => {
-                        // Los primeros 2 se ven de golpe
                         if(index < 2) setTimeout(() => sec.classList.add('visible'), 500); 
                         else observer.observe(sec);
                     });
 
-                    // Se disipa la luz y activamos la Fase 2 (Naturaleza) cinemáticamente
+                    // 4. Se disipa la luz y vemos la Fase 2
                     setTimeout(() => {
                         flash.style.opacity = '0';
                         baseLayer.style.opacity = '1';
                     }, 400);
 
-                }, 1000); // 1 segundo de destello total Cinemático
+                }, 1000); // 1 segundo de pantalla blanca
 
-            }, 500); // Tiempo Cinemático después del tirón
+            }, 800); // Da tiempo a ver el telón subiendo antes del flash
         }
     </script>
 </body>
